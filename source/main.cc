@@ -7,51 +7,233 @@
 
 #include<iostream>
 
+#include<memory>
+
+#include"call.hh"
+#include"number.hh"
+#include"variable.hh"
+#include"binary.hh"
+#include"prototype.hh"
+
 using namespace std;
 
 typedef enum{
   NONE,
-  IDENTIFIER,
+  IDENT,
   SYMBOL,
   INTEGER,
   SPACE,
+  PAREN,
 } classification;
 
-int main(){
-  typedef pair<classification, string> token;
-  string text( "xxx = yz + 301" );
-  vector<token> tokens;
-  map<classification, function<bool(char)> > classDef;
+typedef pair<classification, string> token;
 
-  classDef[NONE] =       []( char ){ return false; };
-  classDef[SYMBOL] =     []( char c ){ return ( ( c == '+' ) || ( c == '=' ) ); };
-  classDef[INTEGER] =    []( char c ){ return isdigit( c ); };
-  classDef[IDENTIFIER] = []( char c ){ return isalpha( c ); };
-  classDef[SPACE] =      []( char c ){ return isspace( c ); };
+class parser{
+  vector<token> mTokens;
+  decltype(mTokens)::iterator mCurTok;
+  map<string, int> mOpPrecedence;
 
-  for( unsigned int i = 0; i < text.size(); ++i ){
-    string tok;
-    classification cls = NONE;
+  int getPrecedence(){
+    int prec = mOpPrecedence[mCurTok->second];
 
-    for( auto it : classDef ){
-      if( it.second( text[i] ) ){
-        cls = it.first;
-        break;
+    if( prec < 0 ){
+      return -1;
+    } else {
+      return prec;
+    }
+  }
+
+  unique_ptr<expression> log_error( const string& str ){
+    cout << "Log Error: " << str << endl;
+    return nullptr;
+  }
+  unique_ptr<prototype> log_proto_error( const string& str ){
+    cout << "Log Error: " << str << endl;
+    return nullptr;
+  }
+
+  std::unique_ptr<number> parse_number(){
+    double value;
+    std::stringstream ss( mCurTok->second );
+
+    ss >> value;
+
+    return std::make_unique<number>( value );
+  }
+  unique_ptr<expression> parse_paren(){
+    ++mCurTok;
+    auto V = parse_expression();
+
+    if( !V ){
+      return nullptr;
+    }
+
+    if( mCurTok->second != ")" ){
+      return log_error( "expected ')'" );
+    }
+
+    ++mCurTok;
+    return V;
+  }
+  unique_ptr<expression> parse_ident(){
+    string name = mCurTok->second;
+    ++mCurTok;
+
+    if( mCurTok->second != "(" ){
+      return make_unique<variable>( name );
+    }
+    ++mCurTok;
+
+    vector<unique_ptr<expression> > args;
+
+    while( mCurTok->second != ")" ){
+      if( auto arg = parse_expression() ){
+        args.push_back( move( arg ) );
+      } else {
+        return nullptr;
+      }
+
+      if( mCurTok->second != "," || mCurTok->second != ")" ){
+        return log_error( "Expected ')' or ',' in argument list" );
+      }
+
+      ++mCurTok;
+    }
+
+    return make_unique<call>( name, move( args ) );
+  }
+  unique_ptr<expression> parse_expression(){
+    auto lhs = parse_primary();
+
+    if( !lhs ){
+      return nullptr;
+    }
+
+    return parse_bin_op( 0, move( lhs ) );
+  }
+  unique_ptr<expression> parse_bin_op( int expPrec, unique_ptr<expression> lhs ){
+    while( true ){
+      int prec = getPrecedence();
+
+      if( prec < expPrec ){
+        return lhs;
+      }
+
+      string op = mCurTok->second;
+
+      ++mCurTok;
+
+      auto rhs = parse_primary();
+      if( !rhs ){
+        return nullptr;
+      }
+
+      int nextPrec = getPrecedence();
+      if( prec < nextPrec ){
+        rhs = parse_bin_op( prec + 1, move( rhs ) );
+        if( !rhs ){
+          return nullptr;
+        }
+      }
+
+      lhs = make_unique<binary>( op, move( lhs ), move( rhs ) );
+    }
+  }
+
+public:
+  template<typename inputIter>
+  parser( inputIter first, inputIter last ):
+    mTokens( first, last ),
+    mCurTok( first ),
+    mOpPrecedence( { { "<", 10 },
+                     { ">", 10 },
+                     { "+", 20 },
+                     { "-", 20 },
+                     { "*", 40 },
+                     { "/", 40 }, } ){
+  }
+
+  unique_ptr<expression> parse_primary(){
+    switch( mCurTok->first ){
+    case PAREN:
+      return parse_paren();
+    break;
+
+    case IDENT:
+      return parse_ident();
+    break;
+
+    case INTEGER:
+      return parse_number();
+    break;
+
+    default:
+      return log_error( "unknown token when expecting an expression." );
+    break;
+    }
+  }
+};
+
+class lexer{
+private:
+  vector<token> mTokens;
+  map<classification, function<bool(char)> > mClassDetect;
+
+public:
+  lexer():
+    mClassDetect( { { NONE,    []( char ){ return false; } },
+                    { SYMBOL,  []( char c ){ return ( ( c == '+' ) || ( c == '=' ) ); } },
+                    { INTEGER, []( char c ){ return isdigit( c ); } },
+                    { IDENT,   []( char c ){ return isalpha( c ); } },
+                    { SPACE,   []( char c ){ return isspace( c ); } } } ){
+  }
+
+  void lex( const string& text ){
+    for( unsigned int i = 0; i < text.size(); ++i ){
+      string tok;
+      classification cls = NONE;
+
+      for( auto it : mClassDetect ){
+        if( it.second( text[i] ) ){
+          cls = it.first;
+          break;
+        }
+      }
+
+      while( mClassDetect[cls]( text[i] ) && ( i < text.size() ) ){
+        tok += text[i++];
+      }
+      --i;
+
+      if( cls != SPACE ){
+        mTokens.emplace_back( cls, tok );
       }
     }
-
-    while( classDef[cls]( text[i] ) && ( i < text.size() ) ){
-      tok += text[i++];
-    }
-    --i;
-    if( cls != SPACE ){
-      tokens.emplace_back( cls, tok );
-    }
   }
 
-  for( auto it : tokens ){
-    cout << it.first << '\t' << it.second << endl;
+  const auto begin() const{
+    return mTokens.begin();
   }
+  const auto end() const{
+    return mTokens.end();
+  }
+
+  auto begin(){
+    return mTokens.begin();
+  }
+  auto end(){
+    return mTokens.end();
+  }
+};
+
+int main(){
+  string text( "xxx = yz + 301" );
+
+  lexer luthor;
+  luthor.lex( text );
+
+  parser p( luthor.begin(), luthor.end() );
+  p.parse_primary();
 
   return 0;
 }
