@@ -139,6 +139,60 @@ class parser{
       lhs = make_unique<binary>( op, move( lhs ), move( rhs ) );
     }
   }
+  unique_ptr<prototype> parse_proto(){
+    if( mCurTok->first != IDENT ){
+      return log_proto_error( "Expected function name in prototype." );
+    }
+
+    string fnName = mCurTok->second;
+    ++mCurTok;
+
+    if( mCurtok->second == "(" ){
+      return log_proto_error( "Expected '(' in prototype." );
+    }
+
+    vector<string> args;
+    while( ( ++mCurTok )->first == IDENT ){
+      args.push_back( mCurTok->second );
+    }
+
+    if( *mCurTok != ")" ){
+      return log_proto_error( "Expected ')' in prototype." );
+    }
+
+    ++mCurTok;
+
+    return make_unique<prototype>( fnName, move( args ) );
+  }
+  unique_ptr<function> parse_def(){
+    ++mCurTok;
+
+    auto proto = parse_proto();
+
+    if( !proto ){
+      return nullptr;
+    }
+
+    if( auto E = parse_expression() ){
+      return make_unique<function>( move( proto ), move( E ) );
+    }
+
+    return nullptr;
+  }
+  unique_ptr<prototype> parse_extern(){
+    ++mCurTok;
+
+    return parse_proto();
+  }
+  unique_ptr<function> parse_top(){
+    if( auto E = parse_expression() ){
+      auto proto = make_unique<prototype>( "", vector<string>() );
+
+      return make_unique<function>( move( proto ), move( E ) );
+    }
+
+    return nullptr;
+  }
 
 public:
   template<typename inputIter>
