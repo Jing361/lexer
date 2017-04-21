@@ -1,7 +1,6 @@
 #ifndef __PROTOTYPE_HH__
 #define __PROTOTYPE_HH__
 
-#include<iterator>
 #include<string>
 #include<vector>
 
@@ -11,10 +10,9 @@ private:
   std::vector<std::string> mArgs;
 
 public:
-  template<typename inputIter>
-  prototype( const std::string& name, inputIter first, inputIter last ):
+  prototype( const std::string& name, std::vector<std::string>&& args ):
     mName( name ),
-    mArgs( std::make_move_iterator( first ), std::make_move_iterator( last ) ){
+    mArgs( args ){
   }
 };
 

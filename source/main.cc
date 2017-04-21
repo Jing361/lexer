@@ -14,16 +14,21 @@
 #include"variable.hh"
 #include"binary.hh"
 #include"prototype.hh"
+#include"function.hh"
 
 using namespace std;
 
 typedef enum{
-  NONE,
-  IDENT,
-  SYMBOL,
-  INTEGER,
-  SPACE,
-  PAREN,
+  CLASS_NONE,
+  CLASS_IDENT,
+  CLASS_SYMBOL,
+  CLASS_INTEGER,
+  CLASS_SPACE,
+  CLASS_PAREN,
+  CLASS_EOF,
+  CLASS_SEMI,
+  CLASS_DEF,
+  CLASS_EXTERN,
 } classification;
 
 typedef pair<classification, string> token;
@@ -140,23 +145,23 @@ class parser{
     }
   }
   unique_ptr<prototype> parse_proto(){
-    if( mCurTok->first != IDENT ){
+    if( mCurTok->first != CLASS_IDENT ){
       return log_proto_error( "Expected function name in prototype." );
     }
 
     string fnName = mCurTok->second;
     ++mCurTok;
 
-    if( mCurtok->second == "(" ){
+    if( mCurTok->second == "(" ){
       return log_proto_error( "Expected '(' in prototype." );
     }
 
     vector<string> args;
-    while( ( ++mCurTok )->first == IDENT ){
+    while( ( ++mCurTok )->first == CLASS_IDENT ){
       args.push_back( mCurTok->second );
     }
 
-    if( *mCurTok != ")" ){
+    if( mCurTok->second != ")" ){
       return log_proto_error( "Expected ')' in prototype." );
     }
 
@@ -164,7 +169,7 @@ class parser{
 
     return make_unique<prototype>( fnName, move( args ) );
   }
-  unique_ptr<function> parse_def(){
+  unique_ptr<func> parse_def(){
     ++mCurTok;
 
     auto proto = parse_proto();
@@ -174,7 +179,7 @@ class parser{
     }
 
     if( auto E = parse_expression() ){
-      return make_unique<function>( move( proto ), move( E ) );
+      return make_unique<func>( move( proto ), move( E ) );
     }
 
     return nullptr;
@@ -184,14 +189,55 @@ class parser{
 
     return parse_proto();
   }
-  unique_ptr<function> parse_top(){
+  unique_ptr<func> parse_top(){
     if( auto E = parse_expression() ){
       auto proto = make_unique<prototype>( "", vector<string>() );
 
-      return make_unique<function>( move( proto ), move( E ) );
+      return make_unique<func>( move( proto ), move( E ) );
     }
 
     return nullptr;
+  }
+
+  unique_ptr<expression> parse_primary(){
+    switch( mCurTok->first ){
+    case CLASS_PAREN:
+      return parse_paren();
+    break;
+
+    case CLASS_IDENT:
+      return parse_ident();
+    break;
+
+    case CLASS_INTEGER:
+      return parse_number();
+    break;
+
+    default:
+      return log_error( "unknown token when expecting an expression." );
+    break;
+    }
+  }
+  void handle_def(){
+    if( parse_def() ){
+      cout << "Parsed function def.\n";
+    } else {
+      ++mCurTok;
+    }
+  }
+  void handle_extern(){
+    if( parse_extern() ){
+      cout << "Parsed extern.\n";
+    } else {
+      ++mCurTok;
+    }
+  }
+  void handle_top(){
+    if( parse_top() ){
+      cout << "Parsed top.\n";
+    } else {
+      ++mCurTok;
+    }
   }
 
 public:
@@ -207,23 +253,30 @@ public:
                      { "/", 40 }, } ){
   }
 
-  unique_ptr<expression> parse_primary(){
-    switch( mCurTok->first ){
-    case PAREN:
-      return parse_paren();
-    break;
+  void main_loop(){
+    while( true ){
+      cout << "ready> ";
+      switch( mCurTok->first ){
+      case CLASS_EOF:
+        return;
+      break;
 
-    case IDENT:
-      return parse_ident();
-    break;
+      case CLASS_SEMI:
+        ++mCurTok;
+      break;
 
-    case INTEGER:
-      return parse_number();
-    break;
+      case CLASS_DEF:
+        handle_def();
+      break;
 
-    default:
-      return log_error( "unknown token when expecting an expression." );
-    break;
+      case CLASS_EXTERN:
+        handle_extern();
+      break;
+
+      default:
+        handle_top();
+      break;
+      }
     }
   }
 };
@@ -235,17 +288,22 @@ private:
 
 public:
   lexer():
-    mClassDetect( { { NONE,    []( char ){ return false; } },
-                    { SYMBOL,  []( char c ){ return ( ( c == '+' ) || ( c == '=' ) ); } },
-                    { INTEGER, []( char c ){ return isdigit( c ); } },
-                    { IDENT,   []( char c ){ return isalpha( c ); } },
-                    { SPACE,   []( char c ){ return isspace( c ); } } } ){
+    mClassDetect( { { CLASS_NONE,    []( char  ){ return false; } },
+                    { CLASS_SYMBOL,  []( char c ){ return ( ( c == '+' ) || ( c == '=' ) ); } },
+                    { CLASS_INTEGER, []( char c ){ return isdigit( c ); } },
+                    { CLASS_IDENT,   []( char c ){ return isalpha( c ); } },
+                    { CLASS_SPACE,   []( char c ){ return isspace( c ); } },
+                    //TODO: perhaps this should only detect '('?
+                    { CLASS_PAREN,   []( char c ){ return c == '(' || c == ')'; } },
+                    { CLASS_EOF,     []( char c ){ return c == -1; } },
+                    { CLASS_SEMI,    []( char c ){ return c == ';'; } } } ){
   }
 
   void lex( const string& text ){
     for( unsigned int i = 0; i < text.size(); ++i ){
+cout << i << endl;
       string tok;
-      classification cls = NONE;
+      classification cls = CLASS_NONE;
 
       for( auto it : mClassDetect ){
         if( it.second( text[i] ) ){
@@ -254,12 +312,24 @@ public:
         }
       }
 
+      if( cls == CLASS_NONE ){
+        cls = CLASS_EOF;
+      }
+
       while( mClassDetect[cls]( text[i] ) && ( i < text.size() ) ){
         tok += text[i++];
       }
       --i;
 
-      if( cls != SPACE ){
+      if( cls == CLASS_IDENT ){
+        if( tok == "def" ){
+          cls = CLASS_DEF;
+        } else if( tok == "extern" ){
+          cls = CLASS_EXTERN;
+        }
+      }
+
+      if( cls != CLASS_SPACE ){
         mTokens.emplace_back( cls, tok );
       }
     }
@@ -281,13 +351,14 @@ public:
 };
 
 int main(){
-  string text( "xxx = yz + 301" );
+  string text( "def foo( x y ) x+foo( y 4 );\n"
+               "def foo( x y ) x+y y;" );
 
   lexer luthor;
   luthor.lex( text );
 
-  parser p( luthor.begin(), luthor.end() );
-  p.parse_primary();
+  parser pansy( luthor.begin(), luthor.end() );
+  pansy.main_loop();
 
   return 0;
 }
