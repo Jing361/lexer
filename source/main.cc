@@ -29,6 +29,7 @@ typedef enum{
   CLASS_SEMI,
   CLASS_DEF,
   CLASS_EXTERN,
+  CLASS_COMMA,
 } classification;
 
 typedef pair<classification, string> token;
@@ -247,6 +248,7 @@ class parser{
   }
 
 public:
+//TODO: maybe comma should be operator with high precedence?
   template<typename inputIter>
   parser( inputIter first, inputIter last ):
     mTokens( first, last ),
@@ -302,7 +304,8 @@ public:
                     //TODO: perhaps this should only detect '('?
                     { CLASS_PAREN,   []( char c ){ return c == '(' || c == ')'; } },
                     { CLASS_EOF,     []( char c ){ return c == -1; } },
-                    { CLASS_SEMI,    []( char c ){ return c == ';'; } } } ){
+                    { CLASS_SEMI,    []( char c ){ return c == ';'; } },
+                    { CLASS_COMMA,   []( char c ){ return c == ','; } } } ){
   }
 
   void lex( const string& text ){
@@ -359,7 +362,7 @@ public:
 };
 
 int main(){
-  string text( "def foo( x y ) x+y;\n" );
+  string text( "def foo( x y ) x+y;\nfoo( 1, 2 );\n" );
 
   lexer luthor;
   luthor.lex( text );
