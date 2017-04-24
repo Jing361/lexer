@@ -39,12 +39,10 @@ class parser{
   map<string, int> mOpPrecedence;
 
   int getPrecedence(){
-    int prec = mOpPrecedence[mCurTok->second];
-
-    if( prec < 0 ){
+    try{
+      return mOpPrecedence.at( mCurTok->second );
+    }catch( out_of_range ){
       return -1;
-    } else {
-      return prec;
     }
   }
 
@@ -152,7 +150,7 @@ class parser{
     string fnName = mCurTok->second;
     ++mCurTok;
 
-    if( mCurTok->second == "(" ){
+    if( mCurTok->second != "(" ){
       return log_proto_error( "Expected '(' in prototype." );
     }
 
@@ -200,6 +198,10 @@ class parser{
   }
 
   unique_ptr<expression> parse_primary(){
+    if( mCurTok == mTokens.end() ){
+      return log_error( "Reached early end of token stream." );
+    }
+
     switch( mCurTok->first ){
     case CLASS_PAREN:
       return parse_paren();
@@ -213,8 +215,12 @@ class parser{
       return parse_number();
     break;
 
+    case CLASS_EOF:
+      return log_error( "Unexpected end of file." );
+    break;
+
     default:
-      return log_error( "unknown token when expecting an expression." );
+      return log_error( "Unknown token: '" + mCurTok->second + "' when expecting an expression." );
     break;
     }
   }
@@ -244,7 +250,7 @@ public:
   template<typename inputIter>
   parser( inputIter first, inputIter last ):
     mTokens( first, last ),
-    mCurTok( first ),
+    mCurTok( mTokens.begin() ),
     mOpPrecedence( { { "<", 10 },
                      { ">", 10 },
                      { "+", 20 },
@@ -289,7 +295,7 @@ private:
 public:
   lexer():
     mClassDetect( { { CLASS_NONE,    []( char  ){ return false; } },
-                    { CLASS_SYMBOL,  []( char c ){ return ( ( c == '+' ) || ( c == '=' ) ); } },
+                    { CLASS_SYMBOL,  []( char c ){ return ( ( c == '+' ) || ( c == '=' ) || ( c == '-' ) ); } },
                     { CLASS_INTEGER, []( char c ){ return isdigit( c ); } },
                     { CLASS_IDENT,   []( char c ){ return isalpha( c ); } },
                     { CLASS_SPACE,   []( char c ){ return isspace( c ); } },
@@ -301,7 +307,6 @@ public:
 
   void lex( const string& text ){
     for( unsigned int i = 0; i < text.size(); ++i ){
-cout << i << endl;
       string tok;
       classification cls = CLASS_NONE;
 
@@ -313,7 +318,8 @@ cout << i << endl;
       }
 
       if( cls == CLASS_NONE ){
-        cls = CLASS_EOF;
+        cout << "Invalid character: '" << text[i] << "'." << endl;
+        continue;
       }
 
       while( mClassDetect[cls]( text[i] ) && ( i < text.size() ) ){
@@ -329,10 +335,12 @@ cout << i << endl;
         }
       }
 
-      if( cls != CLASS_SPACE ){
+      if( cls != CLASS_SPACE && tok != "" ){
         mTokens.emplace_back( cls, tok );
       }
     }
+
+    mTokens.emplace_back( CLASS_EOF, "" );
   }
 
   const auto begin() const{
@@ -351,8 +359,7 @@ cout << i << endl;
 };
 
 int main(){
-  string text( "def foo( x y ) x+foo( y 4 );\n"
-               "def foo( x y ) x+y y;" );
+  string text( "def foo( x y ) x+y;\n" );
 
   lexer luthor;
   luthor.lex( text );
