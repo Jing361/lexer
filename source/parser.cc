@@ -28,6 +28,8 @@ std::unique_ptr<number> parser::parse_number(){
 
   ss >> value;
 
+  ++mCurTok;
+
   return std::make_unique<number>( value );
 }
 
@@ -65,8 +67,8 @@ unique_ptr<expression> parser::parse_ident(){
       return nullptr;
     }
 
-    if( mCurTok->second != "," || mCurTok->second != ")" ){
-      return log_error( "Expected ')' or ',' in argument list" );
+    if( mCurTok->second != "," && mCurTok->second != ")" ){
+      return log_error( "Expected ')' or ',' in argument list; found: '" + mCurTok->second + "'." );
     }
 
     ++mCurTok;
