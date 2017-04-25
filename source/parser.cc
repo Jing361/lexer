@@ -59,15 +59,18 @@ unique_ptr<expression> parser::parse_ident(){
   ++mCurTok;
 
   vector<unique_ptr<expression> > args;
+  bool bEndArgs = false;
 
-  while( mCurTok->second != ")" ){
+  while( mCurTok->second != ")" && !bEndArgs ){
     if( auto arg = parse_expression() ){
       args.push_back( move( arg ) );
     } else {
       return nullptr;
     }
 
-    if( mCurTok->second != "," && mCurTok->second != ")" ){
+    if( mCurTok->second == ")" ){
+      bEndArgs = true;
+    } else if( mCurTok->second != "," ){
       return log_error( "Expected ')' or ',' in argument list; found: '" + mCurTok->second + "'." );
     }
 
