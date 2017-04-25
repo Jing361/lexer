@@ -22,15 +22,8 @@ unique_ptr<prototype> parser::log_proto_error( const string& str ){
   return nullptr;
 }
 
-std::unique_ptr<number> parser::parse_number(){
-  double value;
-  std::stringstream ss( mCurTok->second );
-
-  ss >> value;
-
-  ++mCurTok;
-
-  return std::make_unique<number>( value );
+unique_ptr<number> parser::parse_number(){
+  return make_unique<number>( stod( mCurTok++->second ) );
 }
 
 unique_ptr<expression> parser::parse_paren(){
