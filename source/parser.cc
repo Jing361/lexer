@@ -147,11 +147,31 @@ unique_ptr<func> parser::parse_def(){
     return nullptr;
   }
 
-  if( auto E = parse_expression() ){
-    return make_unique<func>( move( proto ), move( E ) );
+  std::vector<std::unique_ptr<expression> > body;
+  bool bBrackets = false;
+
+  if( mCurTok->second == "{" ){
+    bBrackets = true;
+    ++mCurTok;
   }
 
-  return nullptr;
+  do{
+    if( auto E = parse_expression() ){
+      body.emplace_back( move( E ) );
+    }
+
+    ++mCurTok;
+  }while(bBrackets && mCurTok->second != "}" );
+
+  if( mCurTok->second == "}" ){
+    ++mCurTok;
+  }
+
+  if( !body.empty() && body.front() ){
+    return make_unique<func>( move( proto ), move( body ) );
+  } else {
+    return nullptr;
+  }
 }
 
 unique_ptr<prototype> parser::parse_extern(){
@@ -163,8 +183,10 @@ unique_ptr<prototype> parser::parse_extern(){
 unique_ptr<func> parser::parse_top(){
   if( auto E = parse_expression() ){
     auto proto = make_unique<prototype>( "", vector<string>() );
+    vector<unique_ptr<expression> > vec;
+    vec.emplace_back( move( E ) );
 
-    return make_unique<func>( move( proto ), move( E ) );
+    return make_unique<func>( move( proto ), move( vec ) );
   }
 
   return nullptr;

@@ -16,6 +16,7 @@ typedef enum{
   CLASS_DEF,
   CLASS_EXTERN,
   CLASS_COMMA,
+  CLASS_BRACKET,
 } classification;
 
 typedef std::pair<classification, std::string> token;

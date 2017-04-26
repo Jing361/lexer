@@ -10,10 +10,10 @@
 class func{
 private:
   std::unique_ptr<prototype> mProto;
-  std::unique_ptr<expression> mBody;
+  std::vector<std::unique_ptr<expression> > mBody;
 
 public:
-  func( std::unique_ptr<prototype>&& proto, std::unique_ptr<expression>&& body ):
+  func( std::unique_ptr<prototype>&& proto, std::vector<std::unique_ptr<expression> >&& body ):
     mProto( std::move( proto ) ),
     mBody( std::move( body ) ){
   }

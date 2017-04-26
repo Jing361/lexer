@@ -22,6 +22,7 @@ lexer::lexer():
                   { CLASS_PAREN,    []( char c ){ return c == '(' || c == ')'; } },
                   { CLASS_EOF,      []( char c ){ return c == -1; } },
                   { CLASS_SEMI,     []( char c ){ return c == ';'; } },
+                  { CLASS_BRACKET,  []( char c ){ return ( ( c == '{' ) || ( c == '}' ) ); } },
                   { CLASS_COMMA,    []( char c ){ return c == ','; } } } ){
 }
 
