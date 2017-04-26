@@ -34,6 +34,7 @@ private:
   std::unique_ptr<func> parse_def();
   std::unique_ptr<prototype> parse_extern();
   std::unique_ptr<func> parse_top();
+  std::vector<std::unique_ptr<expression> > parse_brackets();
 
   std::unique_ptr<expression> parse_primary();
   void handle_def();
