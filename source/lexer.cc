@@ -5,16 +5,20 @@
 using namespace std;
 
 lexer::lexer():
-  mClassDetect( { { CLASS_NONE,    []( char  ){ return false; } },
-                  { CLASS_SYMBOL,  []( char c ){ return ( ( c == '+' ) || ( c == '=' ) || ( c == '-' ) ); } },
-                  { CLASS_INTEGER, []( char c ){ return isdigit( c ); } },
-                  { CLASS_IDENT,   []( char c ){ return isalpha( c ); } },
-                  { CLASS_SPACE,   []( char c ){ return isspace( c ); } },
-                  //TODO: perhaps this should only detect '('?
-                  { CLASS_PAREN,   []( char c ){ return c == '(' || c == ')'; } },
-                  { CLASS_EOF,     []( char c ){ return c == -1; } },
-                  { CLASS_SEMI,    []( char c ){ return c == ';'; } },
-                  { CLASS_COMMA,   []( char c ){ return c == ','; } } } ){
+  //TODO: perhaps should only detect '('?
+  mClassDetect( { { CLASS_NONE,     []( char   ){ return false; } },
+                  { CLASS_OPERATOR, []( char c ){ return ( ( c == '+' ) ||
+                                                           ( c == '-' ) ||
+                                                           ( c == '=' ) ||
+                                                           ( c == '*' ) ||
+                                                           ( c == '/' ) ); } },
+                  { CLASS_INTEGER,  []( char c ){ return isdigit( c ); } },
+                  { CLASS_IDENT,    []( char c ){ return isalpha( c ); } },
+                  { CLASS_SPACE,    []( char c ){ return isspace( c ); } },
+                  { CLASS_PAREN,    []( char c ){ return c == '(' || c == ')'; } },
+                  { CLASS_EOF,      []( char c ){ return c == -1; } },
+                  { CLASS_SEMI,     []( char c ){ return c == ';'; } },
+                  { CLASS_COMMA,    []( char c ){ return c == ','; } } } ){
 }
 
 void lexer::lex( const string& text ){

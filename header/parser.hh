@@ -46,10 +46,11 @@ public:
   parser( inputIter first, inputIter last ):
     mTokens( first, last ),
     mCurTok( mTokens.begin() ),
-    mOpPrecedence( { { "<", 10 },
-                     { ">", 10 },
-                     { "+", 20 },
-                     { "-", 20 },
+    mOpPrecedence( { { "<", 20 },
+                     { ">", 20 },
+                     { "=", 10 },
+                     { "+", 30 },
+                     { "-", 30 },
                      { "*", 40 },
                      { "/", 40 }, } ){
   }
