@@ -10,6 +10,10 @@ lexer::lexer():
                   { CLASS_OPERATOR, []( char c ){ return ( ( c == '+' ) ||
                                                            ( c == '-' ) ||
                                                            ( c == '=' ) ||
+                                                           ( c == '<' ) ||
+                                                           ( c == '>' ) ||
+                                                           ( c == '|' ) ||
+                                                           ( c == '&' ) ||
                                                            ( c == '*' ) ||
                                                            ( c == '/' ) ); } },
                   { CLASS_INTEGER,  []( char c ){ return isdigit( c ); } },
