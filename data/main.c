@@ -8,13 +8,13 @@ def bar(x y){
     c + d;
   }
 
-  if( a + b ){
-    c + d;
+  if( e + f ){
+    g + h;
   } else {
-    c - d;
+    i - j;
   }
-  if( a-b ) foo( 3, 4 );
+  if( k-l ) foo( 3, 4 );
 }
 
-bar( 7, 9 );
+bar( 5, 6 );
 

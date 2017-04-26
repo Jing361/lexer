@@ -1,4 +1,5 @@
 #include<iostream>
+#include<string>
 
 #include"parser.hh"
 
@@ -103,6 +104,8 @@ std::vector<std::unique_ptr<expression> > parser::parse_brackets(){
 
   if( mCurTok->second == "}" ){
     ++mCurTok;
+  } else {
+    --mCurTok;
   }
 
   return body;
