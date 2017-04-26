@@ -1,7 +1,5 @@
-#include<cctype>
+#include<fstream>
 #include<string>
-#include<map>
-#include<vector>
 
 #include"lexer.hh"
 #include"parser.hh"
@@ -9,7 +7,15 @@
 using namespace std;
 
 int main(){
-  string text( "def foo( x y ) x+y;\nfoo( 1, 2 );\n" );
+  fstream file( "data/main.c" );
+  string text;
+
+  file.seekg( 0, ios::end );
+  text.reserve( file.tellg() );
+  file.seekg( 0, ios::beg );
+
+  text.assign( istreambuf_iterator<char>( file ),
+               istreambuf_iterator<char>() );
 
   lexer luthor;
   luthor.lex( text );
