@@ -83,11 +83,11 @@ unique_ptr<expression> parser::parse_expression(){
   return parse_bin_op( 0, move( lhs ) );
 }
 
-unique_ptr<expression> parser::parse_bin_op( int expPrec, unique_ptr<expression> lhs ){
+unique_ptr<expression> parser::parse_bin_op( int lhsPrec, unique_ptr<expression> lhs ){
   while( true ){
-    int prec = getPrecedence();
+    int curPrec = getPrecedence();
 
-    if( prec < expPrec ){
+    if( curPrec < lhsPrec ){
       return lhs;
     }
 
@@ -101,8 +101,8 @@ unique_ptr<expression> parser::parse_bin_op( int expPrec, unique_ptr<expression>
     }
 
     int nextPrec = getPrecedence();
-    if( prec < nextPrec ){
-      rhs = parse_bin_op( prec + 1, move( rhs ) );
+    if( nextPrec > curPrec ){
+      rhs = parse_bin_op( curPrec + 1, move( rhs ) );
       if( !rhs ){
         return nullptr;
       }
@@ -224,7 +224,6 @@ void parser::handle_top(){
 
 void parser::main_loop(){
   while( true ){
-    cout << "ready> ";
     switch( mCurTok->first ){
     case CLASS_EOF:
       return;
@@ -248,3 +247,4 @@ void parser::main_loop(){
     }
   }
 }
+
