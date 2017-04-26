@@ -53,6 +53,10 @@ void lexer::lex( const string& text ){
         cls = CLASS_DEF;
       } else if( tok == "extern" ){
         cls = CLASS_EXTERN;
+      } else if( tok == "if" ){
+        cls = CLASS_IF;
+      } else if( tok == "else" ){
+        cls = CLASS_ELSE;
       }
     }
 

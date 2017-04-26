@@ -99,7 +99,7 @@ std::vector<std::unique_ptr<expression> > parser::parse_brackets(){
 
     // skips ';'
     ++mCurTok;
-  }while(bBrackets && mCurTok->second != "}" );
+  }while( bBrackets && mCurTok->second != "}" );
 
   if( mCurTok->second == "}" ){
     ++mCurTok;
@@ -200,6 +200,22 @@ unique_ptr<func> parser::parse_top(){
   return nullptr;
 }
 
+unique_ptr<ifExpr> parser::parse_if(){
+  ++mCurTok;
+
+  auto P = parse_paren();
+  auto T = parse_brackets();
+  vector<unique_ptr<expression> > E;
+
+  if( mCurTok->first == CLASS_ELSE ){
+    ++mCurTok;
+
+    E = parse_brackets();
+  }
+
+  return make_unique<ifExpr>( move( P ), move( T ), move( E ) );
+}
+
 unique_ptr<expression> parser::parse_primary(){
   if( mCurTok == mTokens.end() ){
     return log_error( "Reached early end of token stream." );
@@ -216,6 +232,10 @@ unique_ptr<expression> parser::parse_primary(){
 
   case CLASS_INTEGER:
     return parse_number();
+  break;
+
+  case CLASS_IF:
+    return parse_if();
   break;
 
   case CLASS_EOF:
