@@ -97,9 +97,6 @@ std::vector<std::unique_ptr<expression> > parser::parse_brackets(){
     if( auto E = parse_expression() ){
       body.emplace_back( move( E ) );
     }
-
-    // skips ';'
-    ++mCurTok;
   }while( bBrackets && mCurTok->second != "}" );
 
   if( mCurTok->second == "}" ){
@@ -243,6 +240,11 @@ unique_ptr<expression> parser::parse_primary(){
 
   case CLASS_EOF:
     return log_error( "Unexpected end of file." );
+  break;
+
+  case CLASS_SEMI:
+    ++mCurTok;
+    return nullptr; 
   break;
 
   default:
