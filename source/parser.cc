@@ -188,9 +188,11 @@ unique_ptr<prototype> parser::parse_extern(){
 }
 
 unique_ptr<func> parser::parse_top(){
+  string protoName( mCurTok->second );
+
   if( auto E = parse_expression() ){
     vector<unique_ptr<expression> > vec;
-    auto proto = make_unique<prototype>( "", vector<string>() );
+    auto proto = make_unique<prototype>( protoName, vector<string>() );
 
     vec.emplace_back( move( E ) );
 
