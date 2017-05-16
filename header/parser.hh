@@ -18,8 +18,11 @@
 class parser{
 private:
   std::vector<token> mTokens;
-  decltype(mTokens)::iterator mCurTok;
+  decltype( mTokens )::iterator mCurTok;
   std::map<std::string, int> mOpPrecedence;
+  std::vector<std::unique_ptr<func> > mDefs;
+  std::vector<std::unique_ptr<func> > mTopLevels;
+  std::vector<std::unique_ptr<prototype> > mExterns;
 
   int getPrecedence();
 

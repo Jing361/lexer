@@ -256,24 +256,27 @@ unique_ptr<expression> parser::parse_primary(){
 }
 
 void parser::handle_def(){
-  if( parse_def() ){
+  if( auto D = parse_def() ){
     cout << "Parsed function def.\n";
+    mDefs.emplace_back( move( D ) );
   } else {
     ++mCurTok;
   }
 }
 
 void parser::handle_extern(){
-  if( parse_extern() ){
+  if( auto E = parse_extern() ){
     cout << "Parsed extern.\n";
+    mExterns.emplace_back( move( E ) );
   } else {
     ++mCurTok;
   }
 }
 
 void parser::handle_top(){
-  if( parse_top() ){
+  if( auto T = parse_top() ){
     cout << "Parsed top.\n";
+    mTopLevels.emplace_back( move( T ) );
   } else {
     ++mCurTok;
   }
