@@ -55,6 +55,7 @@ unique_ptr<expression> parser::parse_ident(){
   vector<unique_ptr<expression> > args;
   bool bEndArgs = false;
 
+  // if the '(' was found, it's a function call, parse arguments being passed
   while( mCurTok->second != ")" && !bEndArgs ){
     if( auto arg = parse_expression() ){
       args.push_back( move( arg ) );
@@ -70,6 +71,9 @@ unique_ptr<expression> parser::parse_ident(){
 
     ++mCurTok;
   }
+  //there appears to be a bug that would allow func(arg,)
+  // that is: a comma immediately followed by closing paren
+  //  this is not intended, but not detrimental
 
   return make_unique<call>( name, move( args ) );
 }
@@ -101,8 +105,6 @@ std::vector<std::unique_ptr<expression> > parser::parse_brackets(){
 
   if( mCurTok->second == "}" ){
     ++mCurTok;
-  } else {
-    --mCurTok;
   }
 
   return body;
@@ -148,14 +150,23 @@ unique_ptr<prototype> parser::parse_proto(){
   if( mCurTok->second != "(" ){
     return log_proto_error( "Expected '(' in prototype." );
   }
+  ++mCurTok;
 
   vector<string> args;
-  while( ( ++mCurTok )->first == CLASS_IDENT ){
-    args.push_back( mCurTok->second );
+  if( mCurTok->first == CLASS_IDENT ){
+    do{
+      args.push_back( mCurTok->second );
+      ++mCurTok;
+      if( mCurTok->second == "," ){
+        ++mCurTok;
+      } else {
+        break;
+      }
+    }while( true );
   }
 
   if( mCurTok->second != ")" ){
-    return log_proto_error( "Expected ')' in prototype." );
+    return log_proto_error( "Expected ')' after arguments in prototype." );
   }
 
   ++mCurTok;
