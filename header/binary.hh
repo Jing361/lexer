@@ -19,6 +19,10 @@ public:
     mLhs( std::move( lhs ) ),
     mRhs( std::move( rhs ) ){
   }
+
+  std::string generate() override{
+    return "";
+  }
 };
 
 #endif

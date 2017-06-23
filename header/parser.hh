@@ -35,10 +35,11 @@ private:
   std::unique_ptr<expression> parse_expression();
   std::unique_ptr<expression> parse_bin_op( int expPrec, std::unique_ptr<expression> lhs );
   std::unique_ptr<prototype> parse_proto();
+  std::unique_ptr<ifExpr> parse_if();
+
   std::unique_ptr<func> parse_def();
   std::unique_ptr<prototype> parse_extern();
   std::unique_ptr<func> parse_top();
-  std::unique_ptr<ifExpr> parse_if();
   std::vector<std::unique_ptr<expression> > parse_brackets();
 
   std::unique_ptr<expression> parse_primary();

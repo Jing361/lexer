@@ -283,10 +283,11 @@ void parser::handle_top(){
 }
 
 void parser::main_loop(){
-  while( true ){
+  bool not_eof = true;
+  while( not_eof ){
     switch( mCurTok->first ){
     case CLASS_EOF:
-      return;
+      not_eof = false;
     break;
 
     case CLASS_SEMI:
@@ -305,6 +306,23 @@ void parser::main_loop(){
       handle_top();
     break;
     }
+  }
+
+  cout << "DONE!" << endl;
+
+  cout << "Listing definitions." << endl;
+  for( unsigned int i = 0; i < mDefs.size(); ++i ){
+    cout << mDefs[i]->name() << endl;
+  }
+
+  cout << "Listing externs." << endl;
+  for( unsigned int i = 0; i < mExterns.size(); ++i ){
+    cout << mExterns[i]->name() << endl;
+  }
+
+  cout << "Listing top level." << endl;
+  for( unsigned int i = 0; i < mTopLevels.size(); ++i ){
+    cout << mTopLevels[i]->name() << endl;
   }
 }
 

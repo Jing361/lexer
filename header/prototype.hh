@@ -14,6 +14,10 @@ public:
     mName( name ),
     mArgs( args ){
   }
+
+  std::string name() const{
+    return mName;
+  }
 };
 
 #endif
