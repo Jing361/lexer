@@ -13,15 +13,9 @@ private:
   static unsigned int tmNextAddress;
 
 public:
-  variable( const std::string& name ):
-    mName( name ){
-  }
+  variable( const std::string& name );
 
-  virtual std::string generate() override{
-    //TODO variables have 2 primary uses.  read and write.
-    // how to discern between them?
-    return "PLACEHOLDER\n";
-  }
+  virtual std::string generate() const override;
 };
 
 #endif

@@ -12,7 +12,7 @@ ifExpr::ifExpr( unique_ptr<expression>&& cond,
   mElse( move( kElse ) ){
 }
 
-string ifExpr::generate(){
+string ifExpr::generate() const{
   string instructions;
   string then_label( "then_" + to_string( tmLabelCounter++ ) );
   string end_label( "if_end_" + to_string( tmLabelCounter++ ) );

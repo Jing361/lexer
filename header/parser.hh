@@ -21,7 +21,7 @@ private:
   decltype( mTokens )::iterator mCurTok;
   std::map<std::string, int> mOpPrecedence;
   std::vector<std::unique_ptr<func> > mDefs;
-  std::vector<std::unique_ptr<func> > mTopLevels;
+  std::vector<std::unique_ptr<expression> > mTopLevels;
   std::vector<std::unique_ptr<prototype> > mExterns;
 
   int getPrecedence();
@@ -39,7 +39,7 @@ private:
 
   std::unique_ptr<func> parse_def();
   std::unique_ptr<prototype> parse_extern();
-  std::unique_ptr<func> parse_top();
+  std::unique_ptr<expression> parse_top();
   std::vector<std::unique_ptr<expression> > parse_brackets();
 
   std::unique_ptr<expression> parse_primary();

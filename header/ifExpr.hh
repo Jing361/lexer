@@ -18,7 +18,7 @@ public:
           std::vector<std::unique_ptr<expression> >&& then,
           std::vector<std::unique_ptr<expression> >&& kElse );
 
-  virtual std::string generate() override;
+  virtual std::string generate() const override;
 };
 
 #endif

@@ -13,7 +13,7 @@ int main(){
   vector<string> definitions;
   vector<string> topLevel;
   string text;
-  string code;
+  string code( "goto\tstart\nnop\nnop\nnop\ngoto\tisr\n" );
 
   file.seekg( 0, ios::end );
   text.reserve( file.tellg() );

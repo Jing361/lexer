@@ -3,7 +3,7 @@
 
 #include<string>
 #include<vector>
-#include<iterator>
+#include<memory>
 
 #include"expression.hh"
 
@@ -13,23 +13,12 @@ private:
   std::vector<std::unique_ptr<expression> > mArgs;
 
 public:
-  call( const std::string& callee, std::vector<std::unique_ptr<expression> >&& args ):
-    mCallee( callee ),
-    mArgs( std::move( args ) ){
-  }
+  call( const std::string& callee, std::vector<std::unique_ptr<expression> >&& args );
 
   /*!
-   * @todo verify correct argument count
+   * @todo verify correct argument count(type?)
    */
-  virtual std::string generate() override{
-    std::string instructions;
-
-    for( unsigned int i = 0; i < mArgs.size(); ++i ){
-      instructions += mArgs[i]->generate();
-    }
-
-    return instructions + "call " + mCallee + "\n";
-  }
+  virtual std::string generate() const override;
 };
 
 #endif

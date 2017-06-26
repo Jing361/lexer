@@ -10,14 +10,9 @@ private:
   std::vector<std::string> mArgs;
 
 public:
-  prototype( const std::string& name, std::vector<std::string>&& args ):
-    mName( name ),
-    mArgs( args ){
-  }
+  prototype( const std::string& name, std::vector<std::string>&& args );
 
-  std::string name() const{
-    return mName;
-  }
+  std::string name() const;
 };
 
 #endif

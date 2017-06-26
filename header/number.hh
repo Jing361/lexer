@@ -11,13 +11,9 @@ private:
   double mValue;
 
 public:
-  number( double val ):
-    mValue( val ){
-  }
+  number( double val );
 
-  virtual std::string generate() override{
-    return std::string( "push " ) + std::to_string( mValue ) + "\n";
-  }
+  virtual std::string generate() const override;
 };
 
 #endif

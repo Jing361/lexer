@@ -198,8 +198,9 @@ unique_ptr<prototype> parser::parse_extern(){
   return parse_proto();
 }
 
-unique_ptr<func> parser::parse_top(){
-  string protoName( mCurTok->second );
+unique_ptr<expression> parser::parse_top(){
+  return parse_ident();
+/*  string protoName( mCurTok->second );
 
   if( auto E = parse_expression() ){
     vector<unique_ptr<expression> > vec;
@@ -207,10 +208,11 @@ unique_ptr<func> parser::parse_top(){
 
     vec.emplace_back( move( E ) );
 
-    return make_unique<func>( move( proto ), move( vec ) );
+    return make_unique<call>( move( proto ), move( vec ) );
   }
 
   return nullptr;
+*/
 }
 
 unique_ptr<ifExpr> parser::parse_if(){
@@ -329,11 +331,6 @@ void parser::main_loop(){
   cout << "Listing externs." << endl;
   for( unsigned int i = 0; i < mExterns.size(); ++i ){
     cout << mExterns[i]->name() << endl;
-  }
-
-  cout << "Listing top level." << endl;
-  for( unsigned int i = 0; i < mTopLevels.size(); ++i ){
-    cout << mTopLevels[i]->name() << endl;
   }
 }
 

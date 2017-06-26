@@ -14,24 +14,11 @@ private:
   std::vector<std::unique_ptr<expression> > mBody;
 
 public:
-  func( std::unique_ptr<prototype>&& proto, std::vector<std::unique_ptr<expression> >&& body ):
-    mProto( std::move( proto ) ),
-    mBody( std::move( body ) ){
-  }
+  func( std::unique_ptr<prototype>&& proto, std::vector<std::unique_ptr<expression> >&& body );
 
-  std::string name() const{
-    return mProto->name();
-  }
+  std::string name() const;
 
-  std::string generate() const{
-    std::string instructions( mProto->name() + ":\n" );
-
-    for( unsigned int i = 0; i < mBody.size(); ++i ){
-      instructions += mBody[i]->generate();
-    }
-
-    return instructions + "return\n";
-  }
+  std::string generate() const;
 };
 
 #endif
