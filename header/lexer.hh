@@ -21,8 +21,8 @@ public:
 
   void lex( const std::string& text );
 
-  vec_token::const_iterator begin() const;
-  vec_token::const_iterator end() const;
+  vec_token::const_iterator cbegin() const;
+  vec_token::const_iterator cend() const;
 
   vec_token::iterator begin();
   vec_token::iterator end();

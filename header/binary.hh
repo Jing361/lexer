@@ -21,7 +21,22 @@ public:
   }
 
   std::string generate() override{
-    return "";
+    std::string instructions;
+
+    instructions += mLhs->generate();
+    instructions += mRhs->generate();
+
+    if( mOperator == "+" ){
+      instructions += "add\n";
+    } else if( mOperator == "-" ){
+      instructions += "sub\n";
+    } else if( mOperator == "*" ){
+      instructions += "mul\n";
+    } else if( mOperator == "/" ){
+      instructions += "div\n";
+    }
+
+    return instructions;
   }
 };
 

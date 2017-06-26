@@ -22,6 +22,16 @@ public:
   std::string name() const{
     return mProto->name();
   }
+
+  std::string generate() const{
+    std::string instructions( mProto->name() + ":\n" );
+
+    for( unsigned int i = 0; i < mBody.size(); ++i ){
+      instructions += mBody[i]->generate();
+    }
+
+    return instructions + "return\n";
+  }
 };
 
 #endif

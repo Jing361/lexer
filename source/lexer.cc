@@ -68,10 +68,10 @@ void lexer::lex( const string& text ){
   mTokens.emplace_back( CLASS_EOF, "" );
 }
 
-lexer::vec_token::const_iterator lexer::begin() const{
+lexer::vec_token::const_iterator lexer::cbegin() const{
   return mTokens.cbegin();
 }
-lexer::vec_token::const_iterator lexer::end() const{
+lexer::vec_token::const_iterator lexer::cend() const{
   return mTokens.cend();
 }
 

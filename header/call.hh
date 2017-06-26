@@ -17,6 +17,19 @@ public:
     mCallee( callee ),
     mArgs( std::move( args ) ){
   }
+
+  /*!
+   * @todo verify correct argument count
+   */
+  virtual std::string generate() override{
+    std::string instructions;
+
+    for( unsigned int i = 0; i < mArgs.size(); ++i ){
+      instructions += mArgs[i]->generate();
+    }
+
+    return instructions + "call " + mCallee + "\n";
+  }
 };
 
 #endif

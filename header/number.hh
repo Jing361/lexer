@@ -14,6 +14,10 @@ public:
   number( double val ):
     mValue( val ){
   }
+
+  virtual std::string generate() override{
+    return std::string( "push " ) + std::to_string( mValue ) + "\n";
+  }
 };
 
 #endif

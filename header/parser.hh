@@ -66,6 +66,20 @@ public:
   }
 
   void main_loop();
+
+  template<typename outputIter>
+  void get_defs( outputIter out ){
+    for( unsigned int i = 0; i < mDefs.size(); ++i ){
+      *out++ = mDefs[i]->generate();
+    }
+  }
+
+  template<typename outputIter>
+  void get_top( outputIter out ){
+    for( unsigned int i = 0; i < mTopLevels.size(); ++i ){
+      *out++ = mTopLevels[i]->generate();
+    }
+  }
 };
 
 #endif
