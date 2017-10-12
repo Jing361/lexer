@@ -296,11 +296,12 @@ void parser::handle_top(){
 }
 
 void parser::main_loop(){
-  bool not_eof = true;
-  while( not_eof ){
+  bool found_eof = false;
+
+  while( !found_eof ){
     switch( mCurTok->type ){
     case CLASS_EOF:
-      not_eof = false;
+      found_eof = true;
     break;
 
     case CLASS_SEMI:
