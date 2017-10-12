@@ -7,7 +7,7 @@ using namespace std;
 
 int parser::getPrecedence(){
   try{
-    return mOpPrecedence.at( mCurTok->second );
+    return mOpPrecedence.at( mCurTok->tok );
   }catch( out_of_range ){
     return -1;
   }
@@ -24,7 +24,7 @@ unique_ptr<prototype> parser::log_proto_error( const string& str ){
 }
 
 unique_ptr<number> parser::parse_number(){
-  return make_unique<number>( stod( mCurTok++->second ) );
+  return make_unique<number>( stod( mCurTok++->tok ) );
 }
 
 unique_ptr<expression> parser::parse_paren(){
@@ -35,7 +35,7 @@ unique_ptr<expression> parser::parse_paren(){
     return nullptr;
   }
 
-  if( mCurTok->second != ")" ){
+  if( mCurTok->tok != ")" ){
     return log_error( "expected ')'" );
   }
 
@@ -44,10 +44,10 @@ unique_ptr<expression> parser::parse_paren(){
 }
 
 unique_ptr<expression> parser::parse_ident(){
-  string name = mCurTok->second;
+  string name = mCurTok->tok;
   ++mCurTok;
 
-  if( mCurTok->second != "(" ){
+  if( mCurTok->tok != "(" ){
     return make_unique<variable>( name );
   }
   ++mCurTok;
@@ -56,17 +56,17 @@ unique_ptr<expression> parser::parse_ident(){
   bool bEndArgs = false;
 
   // if the '(' was found, it's a function call, parse arguments being passed
-  while( mCurTok->second != ")" && !bEndArgs ){
+  while( mCurTok->tok != ")" && !bEndArgs ){
     if( auto arg = parse_expression() ){
       args.push_back( move( arg ) );
     } else {
       return nullptr;
     }
 
-    if( mCurTok->second == ")" ){
+    if( mCurTok->tok == ")" ){
       bEndArgs = true;
-    } else if( mCurTok->second != "," ){
-      return log_error( "Expected ')' or ',' in argument list; found: '" + mCurTok->second + "'." );
+    } else if( mCurTok->tok != "," ){
+      return log_error( "Expected ')' or ',' in argument list; found: '" + mCurTok->tok + "'." );
     }
 
     ++mCurTok;
@@ -92,7 +92,7 @@ std::vector<std::unique_ptr<expression> > parser::parse_brackets(){
   std::vector<std::unique_ptr<expression> > body;
   bool bBrackets = false;
 
-  if( mCurTok->second == "{" ){
+  if( mCurTok->tok == "{" ){
     bBrackets = true;
     ++mCurTok;
   }
@@ -101,9 +101,9 @@ std::vector<std::unique_ptr<expression> > parser::parse_brackets(){
     if( auto E = parse_expression() ){
       body.emplace_back( move( E ) );
     }
-  }while( bBrackets && mCurTok->second != "}" );
+  }while( bBrackets && mCurTok->tok != "}" );
 
-  if( mCurTok->second == "}" ){
+  if( mCurTok->tok == "}" ){
     ++mCurTok;
   }
 
@@ -118,7 +118,7 @@ unique_ptr<expression> parser::parse_bin_op( int lhsPrec, unique_ptr<expression>
       return lhs;
     }
 
-    string op = mCurTok->second;
+    string op = mCurTok->tok;
 
     ++mCurTok;
 
@@ -140,24 +140,24 @@ unique_ptr<expression> parser::parse_bin_op( int lhsPrec, unique_ptr<expression>
 }
 
 unique_ptr<prototype> parser::parse_proto(){
-  if( mCurTok->first != CLASS_IDENT ){
+  if( mCurTok->type != CLASS_IDENT ){
     return log_proto_error( "Expected function name in prototype." );
   }
 
-  string fnName = mCurTok->second;
+  string fnName = mCurTok->tok;
   ++mCurTok;
 
-  if( mCurTok->second != "(" ){
+  if( mCurTok->tok != "(" ){
     return log_proto_error( "Expected '(' in prototype." );
   }
   ++mCurTok;
 
   vector<string> args;
-  if( mCurTok->first == CLASS_IDENT ){
+  if( mCurTok->type == CLASS_IDENT ){
     do{
-      args.push_back( mCurTok->second );
+      args.push_back( mCurTok->tok );
       ++mCurTok;
-      if( mCurTok->second == "," ){
+      if( mCurTok->tok == "," ){
         ++mCurTok;
       } else {
         break;
@@ -165,7 +165,7 @@ unique_ptr<prototype> parser::parse_proto(){
     }while( true );
   }
 
-  if( mCurTok->second != ")" ){
+  if( mCurTok->tok != ")" ){
     return log_proto_error( "Expected ')' after arguments in prototype." );
   }
 
@@ -200,7 +200,7 @@ unique_ptr<prototype> parser::parse_extern(){
 
 unique_ptr<expression> parser::parse_top(){
   return parse_ident();
-/*  string protoName( mCurTok->second );
+/*  string protoName( mCurTok->tok );
 
   if( auto E = parse_expression() ){
     vector<unique_ptr<expression> > vec;
@@ -222,7 +222,7 @@ unique_ptr<ifExpr> parser::parse_if(){
   auto T = parse_brackets();
   vector<unique_ptr<expression> > E;
 
-  if( mCurTok->first == CLASS_ELSE ){
+  if( mCurTok->type == CLASS_ELSE ){
     ++mCurTok;
 
     E = parse_brackets();
@@ -236,7 +236,7 @@ unique_ptr<expression> parser::parse_primary(){
     return log_error( "Reached early end of token stream." );
   }
 
-  switch( mCurTok->first ){
+  switch( mCurTok->type ){
   case CLASS_PAREN:
     return parse_paren();
   break;
@@ -263,7 +263,7 @@ unique_ptr<expression> parser::parse_primary(){
   break;
 
   default:
-    return log_error( "Unknown token: '" + mCurTok->second + "' when expecting an expression." );
+    return log_error( "Unknown token: '" + mCurTok->tok + "' when expecting an expression." );
   break;
   }
 }
@@ -298,7 +298,7 @@ void parser::handle_top(){
 void parser::main_loop(){
   bool not_eof = true;
   while( not_eof ){
-    switch( mCurTok->first ){
+    switch( mCurTok->type ){
     case CLASS_EOF:
       not_eof = false;
     break;

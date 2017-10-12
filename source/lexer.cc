@@ -27,9 +27,13 @@ lexer::lexer():
 }
 
 void lexer::lex( const string& text ){
+  unsigned long row = 0;
+  unsigned long column = 0;
+
   for( unsigned int i = 0; i < text.size(); ++i ){
     string tok;
     classification cls = CLASS_NONE;
+    ++column;
 
     for( auto it : mClassDetect ){
       if( it.second( text[i] ) ){
@@ -61,11 +65,14 @@ void lexer::lex( const string& text ){
     }
 
     if( cls != CLASS_SPACE && tok != "" ){
-      mTokens.emplace_back( cls, tok );
+      mTokens.emplace_back( cls, tok, row, column );
+    } else if( !tok.empty() && ( tok[0] == '\n' || tok[0] == '\r' ) ){
+      column = 0;
+      ++row;
     }
   }
 
-  mTokens.emplace_back( CLASS_EOF, "" );
+  mTokens.emplace_back( CLASS_EOF, "", row, column );
 }
 
 lexer::vec_token::const_iterator lexer::cbegin() const{

@@ -21,7 +21,19 @@ typedef enum{
   CLASS_ELSE,
 } classification;
 
-typedef std::pair<classification, std::string> token;
+struct token{
+  classification type;
+  std::string tok;
+  unsigned long row;
+  unsigned long column;
+
+  token( classification c, const std::string& s, unsigned long r, unsigned long o ):
+    type( c ),
+    tok( s ),
+    row( r ),
+    column( o ){
+  }
+};
 
 #endif
 
