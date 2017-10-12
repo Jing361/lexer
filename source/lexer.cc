@@ -49,8 +49,10 @@ void lexer::lex( const string& text ){
 
     while( mClassDetect[cls]( text[i] ) && ( i < text.size() ) ){
       tok += text[i++];
+      ++column;
     }
     --i;
+    --column;
 
     if( cls == CLASS_IDENT ){
       if( tok == "def" ){
@@ -78,6 +80,7 @@ void lexer::lex( const string& text ){
 lexer::vec_token::const_iterator lexer::cbegin() const{
   return mTokens.cbegin();
 }
+
 lexer::vec_token::const_iterator lexer::cend() const{
   return mTokens.cend();
 }
@@ -85,6 +88,7 @@ lexer::vec_token::const_iterator lexer::cend() const{
 lexer::vec_token::iterator lexer::begin(){
   return mTokens.begin();
 }
+
 lexer::vec_token::iterator lexer::end(){
   return mTokens.end();
 }
