@@ -2,9 +2,7 @@
 #define __LEXER_HH__
 
 #include<vector>
-#include<functional>
 #include<string>
-#include<map>
 
 #include"shared.hh"
 
@@ -14,12 +12,16 @@ public:
 
 private:
   vec_token mTokens;
-  std::map<classification, std::function<bool(char)> > mClassDetect;
+  std::string mText;
+  std::string::iterator mIter;
+
+  void lex();
+
+  void
+  process_number();
 
 public:
-  lexer();
-
-  void lex( const std::string& text );
+  lexer( const std::string& text );
 
   vec_token::const_iterator cbegin() const;
   vec_token::const_iterator cend() const;

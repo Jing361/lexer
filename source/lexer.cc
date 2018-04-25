@@ -1,106 +1,66 @@
-#include<iostream>
-
 #include"lexer.hh"
 
 using namespace std;
 
-static classification classify( char c ){
-  if( ( c == '-' ) ||
-      ( c == '=' ) ||
-      ( c == '<' ) ||
-      ( c == '>' ) ||
-      ( c == '|' ) ||
-      ( c == '&' ) ||
-      ( c == '*' ) ||
-      ( c == '/' ) ){
-    return classification::OPERATOR;
-  } else if( isdigit( c ) ){
-    return classification::INTEGER;
-  } else if( isalpha( c ) ){
-    return classification::IDENT;
-  } else if( isspace( c ) ){
-    return classification::SPACE;
-  } else if( c == '(' || c == ')' ){
-    return classification::PAREN;
-  } else if( c == -1 ){
-    return classification::EoF;
-  } else if( c == ';' ){
-    return classification::SEMI;
-  } else if( ( c == '{' ) || ( c == '}' ) )
-    return classification::BRACKET;
-  } else if( c == ',' ){
-    return classification::COMMA;
-  } else {
-    return classification::NONE;
-  }
+lexer::lexer( const std::string& text )
+  : mText( text ){
+  mIter = mText.begin();
+  lex();
 }
 
-lexer::lexer():
-  //TODO: perhaps should only detect '('?
-  mClassDetect( { { classification::NONE,     []( char   ){ return false; } },
-                  { classification::OPERATOR, []( char c ){ return ( ( c == '+' ) ||
-                                                                     ( c == '-' ) ||
-                                                                     ( c == '=' ) ||
-                                                                     ( c == '<' ) ||
-                                                                     ( c == '>' ) ||
-                                                                     ( c == '|' ) ||
-                                                                     ( c == '&' ) ||
-                                                                     ( c == '*' ) ||
-                                                                     ( c == '/' ) ); } },
-                  { classification::INTEGER,  []( char c ){ return isdigit( c ); } },
-                  { classification::IDENT,    []( char c ){ return isalpha( c ); } },
-                  { classification::SPACE,    []( char c ){ return isspace( c ); } },
-                  { classification::PAREN,    []( char c ){ return c == '(' || c == ')'; } },
-                  { classification::EoF,      []( char c ){ return c == -1; } },
-                  { classification::SEMI,     []( char c ){ return c == ';'; } },
-                  { classification::BRACKET,  []( char c ){ return ( ( c == '{' ) || ( c == '}' ) ); } },
-                  { classification::COMMA,    []( char c ){ return c == ','; } } } ){
-}
+lexer::lex(){
+  while( mIter != mText.end() ){
+    if( is_digit( *mIter ) ){
+      mTokens.emplace_back( classification::NUMBER, process_number() );
+    } else if( is_alpha( *mIter ) ){
+      string lexeme( 1, *mIter++ );
 
-void lexer::lex( const string& text ){
-  unsigned long row = 0;
-  unsigned long column = 0;
-
-  for( unsigned int i = 0; i < text.size(); ++i ){
-    string tok;
-    classification cls = classification::NONE;
-    ++column;
-
-    cls = classifiy( it.second( text[i] );
-
-    if( cls == classification::NONE ){
-      cout << "Invalid character: '" << text[i] << "'." << endl;
-      continue;
-    }
-
-    while( mClassDetect[cls]( text[i] ) && ( i < text.size() ) ){
-      tok += text[i++];
-      ++column;
-    }
-    --i;
-    --column;
-
-    if( cls == classification::IDENT ){
-      if( types.count( tok ) ){
-        cls = classification::TYPE;
-      } else if( tok == "extern" ){
-        cls = classification::EXTERN;
-      } else if( tok == "if" ){
-        cls = classification::IF;
-      } else if( tok == "else" ){
-        cls = classification::ELSE;
+      while( is_alpha( *mIter ) ){
+        lexeme.push_back( *mIter++ );
       }
-    }
 
-    if( cls != classification::SPACE && tok != "" ){
-      mTokens.emplace_back( cls, tok, row, column );
-    } else if( !tok.empty() && ( tok[0] == '\n' || tok[0] == '\r' ) ){
-      column = 0;
-      ++row;
+      if( lexeme == "if" ){
+        mTokens.emplace_back( classification::IF, lexeme );
+      } else if( lexeme == "else" ){
+        mTokens.emplace_back( classification::ELSE, lexeme );
+      } else if( lexeme == "extern" ){
+        mTokens.emplace_back( classification::EXTERN, lexeme );
+      } else {
+        mTokens.emplace_back( classification::IDENTIFIER, lexeme );
+      }
+    } else if( *mIter == '*' ){
+      mTokens.emplace_back( classification::STAR, string( 1, *mIter++ ) );
+    } else if( *mIter == '/' ){
+      mTokens.emplace_back( classification::SLASH, string( 1, *mIter++ ) );
+    } else if( *mIter == '+' ){
+      mTokens.emplace_back( classification::PLUS, string( 1, *mIter++ ) );
+    } else if( *mIter == '-' ){
+      mTokens.emplace_back( classification::MINUS, string( 1, *mIter++ ) );
     }
   }
+}
 
-  mTokens.emplace_back( EoF, "", row, column );
+string
+lexer::process_number(){
+  string lexeme( 1, *mIter++ );
+  int decimal_count = 0;
+  bool stop = false;
+
+  do{
+    if( *mIter == '.' ){
+      if( decimal_count++ < 1 ){
+        lexeme.push_back( *mIter++ );
+      } else {
+        throw error;
+      }
+    } else if( is_digit( *mIter ) /*|| *mIter == 'e'*/ ){
+      lexeme.push_back( *mIter++ );
+    } else {
+      stop = true;
+    }
+  } while( !stop );
+
+  return lexeme;
 }
 
 lexer::vec_token::const_iterator lexer::cbegin() const{
