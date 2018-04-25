@@ -28,7 +28,7 @@ preprocess( const string& str ){
     if( str[i] == '/' ){
       if( str[i + 1] == '/' ){
         i += 2;
-        while( !( str[i] == '\r' && str[i] == '\n' ) ){
+        while( str[i] != '\r' && str[i] != '\n' ){
           ++i;
         }
       } else if( str[i + 1] == '*' ){

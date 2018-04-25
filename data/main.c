@@ -1,3 +1,4 @@
+// test comment
 void foo( x, y ){ x + y; }
 foo( 1, 2 );
 
@@ -8,6 +9,7 @@ void bar(x, y){
   int a;
   int b;
   int c;
+// test comment
   int d;
   int e;
   int f;
@@ -17,6 +19,13 @@ void bar(x, y){
   int j;
   int k;
   int l;
+/* int m;
+  int n;
+  int o;
+  int p;
+  int q;
+*/
+  int r;
 
   x + y;
   z = x - y;
