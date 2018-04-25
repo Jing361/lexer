@@ -5,7 +5,7 @@
 #include<string>
 #include<set>
 
-enum class{
+enum class classification{
   NONE,
   IDENTIFIER,
   NUMBER,
@@ -27,7 +27,8 @@ enum class{
   PLUS,
   STAR,
   SLASH,
-} classification;
+  EQUAL,
+};
 
 struct token{
   classification type;
@@ -36,7 +37,7 @@ struct token{
 
   token( classification cl, const std::string& s, unsigned long r = 0, unsigned long co = 0 )
     : type( cl )
-    , tok( s )
+    , lexeme( s )
     , location( r, co ){
   }
 };

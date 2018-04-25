@@ -17,7 +17,7 @@ private:
 
   void lex();
 
-  void
+  std::string
   process_number();
 
 public:

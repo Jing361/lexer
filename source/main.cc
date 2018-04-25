@@ -22,30 +22,15 @@ int main(){
   text.assign( istreambuf_iterator<char>( file ),
                istreambuf_iterator<char>() );
 
-  lexer luthor;
-  luthor.lex( text );
+  lexer luthor( preprocess( text ) );
 
-  parser pansy( luthor.begin(), luthor.end() );
-  pansy.main_loop();
-
-  cout << "generating code" << endl;
-  cout << "\tdefinitions" << endl;
-  pansy.get_defs( back_inserter( definitions ) );
-  cout << "\ttoplevel" << endl;
-  pansy.get_top( back_inserter( topLevel ) );
-
-  cout << "concatenating code" << endl;
-  cout << "\ttoplevel" << endl;
-  for( auto top : topLevel ){
-    code += top;
+  cout << "original:" << endl;
+  cout << text << endl;
+  cout << endl;
+  cout << "parsed:" << endl;
+  for( auto token : luthor ){
+    cout << token.lexeme;
   }
-
-  cout << "\tdefinitions" << endl;
-  for( auto def : definitions ){
-    code += def;
-  }
-
-  cout << code << endl;
 
   return 0;
 }

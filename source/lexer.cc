@@ -1,3 +1,5 @@
+#include<stdexcept>
+
 #include"lexer.hh"
 
 using namespace std;
@@ -8,14 +10,18 @@ lexer::lexer( const std::string& text )
   lex();
 }
 
+void
 lexer::lex(){
   while( mIter != mText.end() ){
-    if( is_digit( *mIter ) ){
+    if( *mIter == ' ' || *mIter == '\r' || *mIter == '\n' ){
+      ++mIter;
+      continue;
+    } else if( is_digit( *mIter ) ){
       mTokens.emplace_back( classification::NUMBER, process_number() );
-    } else if( is_alpha( *mIter ) ){
+    } else if( is_alpha( *mIter ) || *mIter == '_' ){
       string lexeme( 1, *mIter++ );
 
-      while( is_alpha( *mIter ) ){
+      while( is_alpha( *mIter ) || *mIter == '_' || is_digit( *mIter ) ){
         lexeme.push_back( *mIter++ );
       }
 
@@ -37,6 +43,8 @@ lexer::lex(){
       ++mIter;
 
       mTokens.emplace_back( classification::STRING, lexeme );
+    } else if( *mIter == ',' ){
+      mTokens.emplace_back( classification::COMMA,    string( 1, *mIter++ ) );
     } else if( *mIter == '*' ){
       mTokens.emplace_back( classification::STAR,     string( 1, *mIter++ ) );
     } else if( *mIter == '/' ){
@@ -57,6 +65,12 @@ lexer::lex(){
       mTokens.emplace_back( classification::LBRACE,   string( 1, *mIter++ ) );
     } else if( *mIter == '}' ){
       mTokens.emplace_back( classification::RBRACE,   string( 1, *mIter++ ) );
+    } else if( *mIter == ';' ){
+      mTokens.emplace_back( classification::SEMI,   string( 1, *mIter++ ) );
+    } else if( *mIter == '=' ){
+      mTokens.emplace_back( classification::EQUAL,   string( 1, *mIter++ ) );
+    } else {
+      throw runtime_error( string( "Invalid token: " ) + string( 1, *mIter ) );
     }
   }
 }
@@ -72,7 +86,7 @@ lexer::process_number(){
       if( decimal_count++ < 1 ){
         lexeme.push_back( *mIter++ );
       } else {
-        throw error;
+        throw runtime_error( "Number can only have one decimal place" );
       }
     } else if( is_digit( *mIter ) /*|| *mIter == 'e'*/ ){
       lexeme.push_back( *mIter++ );

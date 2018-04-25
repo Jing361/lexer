@@ -22,7 +22,7 @@ preprocess( const string& str ){
     if( str[i] == ' '
      || str[i] == '\r'
      || str[i] == '\n' ){
-      continue;
+      ret.push_back( str[i] );
     }
 
     if( str[i] == '/' ){
@@ -33,7 +33,7 @@ preprocess( const string& str ){
         }
       } else if( str[i + 1] == '*' ){
         i += 2;
-        while( !( stri[i] == '*' && str[i + 1] == '/' ) ){
+        while( !( str[i] == '*' && str[i + 1] == '/' ) ){
           ++i;
         }
       }

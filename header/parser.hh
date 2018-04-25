@@ -27,22 +27,7 @@ private:
   int getPrecedence();
 
   std::unique_ptr<expression> log_error( const std::string& str );
-  std::unique_ptr<prototype> log_proto_error( const std::string& str );
 
-  std::unique_ptr<number> parse_number();
-  std::unique_ptr<expression> parse_paren();
-  std::unique_ptr<expression> parse_ident();
-  std::unique_ptr<expression> parse_expression();
-  std::unique_ptr<expression> parse_bin_op( int expPrec, std::unique_ptr<expression> lhs );
-  std::unique_ptr<prototype> parse_proto();
-  std::unique_ptr<ifExpr> parse_if();
-
-  std::unique_ptr<func> parse_def();
-  std::unique_ptr<prototype> parse_extern();
-  std::unique_ptr<expression> parse_top();
-  std::vector<std::unique_ptr<expression> > parse_brackets();
-
-  std::unique_ptr<expression> parse_primary();
   void handle_def();
   void handle_extern();
   void handle_top();
@@ -66,20 +51,6 @@ public:
   }
 
   void main_loop();
-
-  template<typename outputIter>
-  void get_defs( outputIter out ){
-    for( unsigned int i = 0; i < mDefs.size(); ++i ){
-      *out++ = mDefs[i]->generate();
-    }
-  }
-
-  template<typename outputIter>
-  void get_top( outputIter out ){
-    for( unsigned int i = 0; i < mTopLevels.size(); ++i ){
-      *out++ = mTopLevels[i]->generate();
-    }
-  }
 };
 
 #endif
