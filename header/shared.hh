@@ -3,22 +3,23 @@
 
 #include<utility>
 #include<string>
+#include<set>
 
-typedef enum{
-  CLASS_NONE,
-  CLASS_IDENT,
-  CLASS_OPERATOR,
-  CLASS_INTEGER,
-  CLASS_SPACE,
-  CLASS_PAREN,
-  CLASS_EOF,
-  CLASS_SEMI,
-  CLASS_DEF,
-  CLASS_EXTERN,
-  CLASS_COMMA,
-  CLASS_BRACKET,
-  CLASS_IF,
-  CLASS_ELSE,
+enum class{
+  NONE,
+  IDENT,
+  OPERATOR,
+  INTEGER,
+  SPACE,
+  PAREN,
+  EoF,
+  SEMI,
+  EXTERN,
+  COMMA,
+  BRACKET,
+  IF,
+  ELSE,
+  TYPE,
 } classification;
 
 struct token{
@@ -34,6 +35,8 @@ struct token{
     column( o ){
   }
 };
+
+extern std::set<std::string> types;
 
 #endif
 

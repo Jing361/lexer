@@ -1,7 +1,23 @@
-def foo( x, y ) x + y;
+void foo( x, y ){ x + y; }
 foo( 1, 2 );
 
-def bar(x, y){
+void bar(x, y){
+  int x;
+  int y;
+  int z;
+  int a;
+  int b;
+  int c;
+  int d;
+  int e;
+  int f;
+  int g;
+  int h;
+  int i;
+  int j;
+  int k;
+  int l;
+
   x + y;
   z = x - y;
   if( a + b ){

@@ -268,56 +268,57 @@ unique_ptr<expression> parser::parse_primary(){
   }
 }
 
-void parser::handle_def(){
-  if( auto D = parse_def() ){
-    cout << "Parsed function def.\n";
-    mDefs.emplace_back( move( D ) );
+void parser::handle_declaration(){
+  string ident_type = mCurTok++->tok;
+  string ident;
+
+  if( mCurTok->type == IDENT ){
+    ident = mCurTok++->tok;
   } else {
-    ++mCurTok;
+    cout << "Expected identifier" << endl;
+    return;
+  }
+
+  if( mCurTok->type == PAREN ){
+    handle_function_declaration( ident, ident_type );
+  } else {
+    handle_variable_declaration( ident, ident_type );
   }
 }
 
-void parser::handle_extern(){
-  if( auto E = parse_extern() ){
-    cout << "Parsed extern.\n";
-    mExterns.emplace_back( move( E ) );
-  } else {
-    ++mCurTok;
+void parser::handle_function_declaration( ident, ident_type ){
+  if( mCurTok->type != PAREN ){
+    cout << "Expected '('" << endl;
+    return;
   }
+
+  parse_proto();
 }
 
-void parser::handle_top(){
-  if( auto T = parse_top() ){
-    cout << "Parsed top.\n";
-    mTopLevels.emplace_back( move( T ) );
-  } else {
-    ++mCurTok;
+void parser::handle_variable_declaration( ident, ident_type ){
+  if( mCurTok->tok == "=" ){
+    handle_initialization();
   }
+
+  mVariables.emplace( ident, ident_type );
 }
+
 
 void parser::main_loop(){
   bool found_eof = false;
 
   while( !found_eof ){
     switch( mCurTok->type ){
-    case CLASS_EOF:
+    case classification::CLASS_EOF:
       found_eof = true;
     break;
 
-    case CLASS_SEMI:
-      ++mCurTok;
-    break;
-
-    case CLASS_DEF:
-      handle_def();
-    break;
-
-    case CLASS_EXTERN:
-      handle_extern();
+    case classification::TYPE:
+      handle_declaration();
     break;
 
     default:
-      handle_top();
+      cout << "Error!" << endl;
     break;
     }
   }

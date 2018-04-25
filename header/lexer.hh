@@ -13,7 +13,7 @@ public:
   typedef std::vector<token> vec_token;
 
 private:
-  std::vector<token> mTokens;
+  vec_token mTokens;
   std::map<classification, std::function<bool(char)> > mClassDetect;
 
 public:

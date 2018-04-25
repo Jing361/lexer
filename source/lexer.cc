@@ -4,26 +4,57 @@
 
 using namespace std;
 
+static classification classify( char c ){
+  if( ( c == '-' ) ||
+      ( c == '=' ) ||
+      ( c == '<' ) ||
+      ( c == '>' ) ||
+      ( c == '|' ) ||
+      ( c == '&' ) ||
+      ( c == '*' ) ||
+      ( c == '/' ) ){
+    return classification::OPERATOR;
+  } else if( isdigit( c ) ){
+    return classification::INTEGER;
+  } else if( isalpha( c ) ){
+    return classification::IDENT;
+  } else if( isspace( c ) ){
+    return classification::SPACE;
+  } else if( c == '(' || c == ')' ){
+    return classification::PAREN;
+  } else if( c == -1 ){
+    return classification::EoF;
+  } else if( c == ';' ){
+    return classification::SEMI;
+  } else if( ( c == '{' ) || ( c == '}' ) )
+    return classification::BRACKET;
+  } else if( c == ',' ){
+    return classification::COMMA;
+  } else {
+    return classification::NONE;
+  }
+}
+
 lexer::lexer():
   //TODO: perhaps should only detect '('?
-  mClassDetect( { { CLASS_NONE,     []( char   ){ return false; } },
-                  { CLASS_OPERATOR, []( char c ){ return ( ( c == '+' ) ||
-                                                           ( c == '-' ) ||
-                                                           ( c == '=' ) ||
-                                                           ( c == '<' ) ||
-                                                           ( c == '>' ) ||
-                                                           ( c == '|' ) ||
-                                                           ( c == '&' ) ||
-                                                           ( c == '*' ) ||
-                                                           ( c == '/' ) ); } },
-                  { CLASS_INTEGER,  []( char c ){ return isdigit( c ); } },
-                  { CLASS_IDENT,    []( char c ){ return isalpha( c ); } },
-                  { CLASS_SPACE,    []( char c ){ return isspace( c ); } },
-                  { CLASS_PAREN,    []( char c ){ return c == '(' || c == ')'; } },
-                  { CLASS_EOF,      []( char c ){ return c == -1; } },
-                  { CLASS_SEMI,     []( char c ){ return c == ';'; } },
-                  { CLASS_BRACKET,  []( char c ){ return ( ( c == '{' ) || ( c == '}' ) ); } },
-                  { CLASS_COMMA,    []( char c ){ return c == ','; } } } ){
+  mClassDetect( { { classification::NONE,     []( char   ){ return false; } },
+                  { classification::OPERATOR, []( char c ){ return ( ( c == '+' ) ||
+                                                                     ( c == '-' ) ||
+                                                                     ( c == '=' ) ||
+                                                                     ( c == '<' ) ||
+                                                                     ( c == '>' ) ||
+                                                                     ( c == '|' ) ||
+                                                                     ( c == '&' ) ||
+                                                                     ( c == '*' ) ||
+                                                                     ( c == '/' ) ); } },
+                  { classification::INTEGER,  []( char c ){ return isdigit( c ); } },
+                  { classification::IDENT,    []( char c ){ return isalpha( c ); } },
+                  { classification::SPACE,    []( char c ){ return isspace( c ); } },
+                  { classification::PAREN,    []( char c ){ return c == '(' || c == ')'; } },
+                  { classification::EoF,      []( char c ){ return c == -1; } },
+                  { classification::SEMI,     []( char c ){ return c == ';'; } },
+                  { classification::BRACKET,  []( char c ){ return ( ( c == '{' ) || ( c == '}' ) ); } },
+                  { classification::COMMA,    []( char c ){ return c == ','; } } } ){
 }
 
 void lexer::lex( const string& text ){
@@ -32,17 +63,12 @@ void lexer::lex( const string& text ){
 
   for( unsigned int i = 0; i < text.size(); ++i ){
     string tok;
-    classification cls = CLASS_NONE;
+    classification cls = classification::NONE;
     ++column;
 
-    for( auto it : mClassDetect ){
-      if( it.second( text[i] ) ){
-        cls = it.first;
-        break;
-      }
-    }
+    cls = classifiy( it.second( text[i] );
 
-    if( cls == CLASS_NONE ){
+    if( cls == classification::NONE ){
       cout << "Invalid character: '" << text[i] << "'." << endl;
       continue;
     }
@@ -54,19 +80,19 @@ void lexer::lex( const string& text ){
     --i;
     --column;
 
-    if( cls == CLASS_IDENT ){
-      if( tok == "def" ){
-        cls = CLASS_DEF;
+    if( cls == classification::IDENT ){
+      if( types.count( tok ) ){
+        cls = classification::TYPE;
       } else if( tok == "extern" ){
-        cls = CLASS_EXTERN;
+        cls = classification::EXTERN;
       } else if( tok == "if" ){
-        cls = CLASS_IF;
+        cls = classification::IF;
       } else if( tok == "else" ){
-        cls = CLASS_ELSE;
+        cls = classification::ELSE;
       }
     }
 
-    if( cls != CLASS_SPACE && tok != "" ){
+    if( cls != classification::SPACE && tok != "" ){
       mTokens.emplace_back( cls, tok, row, column );
     } else if( !tok.empty() && ( tok[0] == '\n' || tok[0] == '\r' ) ){
       column = 0;
@@ -74,7 +100,7 @@ void lexer::lex( const string& text ){
     }
   }
 
-  mTokens.emplace_back( CLASS_EOF, "", row, column );
+  mTokens.emplace_back( EoF, "", row, column );
 }
 
 lexer::vec_token::const_iterator lexer::cbegin() const{
