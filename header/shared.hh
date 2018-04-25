@@ -12,6 +12,7 @@ enum class{
   EoF,
   SEMI,
   COMMA,
+  STRING,
   LPAREN,//(
   RPAREN,//)
   LBRACE,//{

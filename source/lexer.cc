@@ -28,14 +28,35 @@ lexer::lex(){
       } else {
         mTokens.emplace_back( classification::IDENTIFIER, lexeme );
       }
+    } else if( *mIter == '"' ){
+      string lexeme( 1, *mIter++ );
+
+      while( *mIter != '"' ){
+        lexeme.push_back( *mIter++ );
+      }
+      ++mIter;
+
+      mTokens.emplace_back( classification::STRING, lexeme );
     } else if( *mIter == '*' ){
-      mTokens.emplace_back( classification::STAR, string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::STAR,     string( 1, *mIter++ ) );
     } else if( *mIter == '/' ){
-      mTokens.emplace_back( classification::SLASH, string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::SLASH,    string( 1, *mIter++ ) );
     } else if( *mIter == '+' ){
-      mTokens.emplace_back( classification::PLUS, string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::PLUS,     string( 1, *mIter++ ) );
     } else if( *mIter == '-' ){
-      mTokens.emplace_back( classification::MINUS, string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::MINUS,    string( 1, *mIter++ ) );
+    } else if( *mIter == '(' ){
+      mTokens.emplace_back( classification::LPAREN,   string( 1, *mIter++ ) );
+    } else if( *mIter == ')' ){
+      mTokens.emplace_back( classification::RPAREN,   string( 1, *mIter++ ) );
+    } else if( *mIter == '[' ){
+      mTokens.emplace_back( classification::LBRACKET, string( 1, *mIter++ ) );
+    } else if( *mIter == ']' ){
+      mTokens.emplace_back( classification::RBRACKET, string( 1, *mIter++ ) );
+    } else if( *mIter == '{' ){
+      mTokens.emplace_back( classification::LBRACE,   string( 1, *mIter++ ) );
+    } else if( *mIter == '}' ){
+      mTokens.emplace_back( classification::RBRACE,   string( 1, *mIter++ ) );
     }
   }
 }
