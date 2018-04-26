@@ -6,6 +6,7 @@
 
 #include"expression.hh"
 
+// if expressions are more statements, but this is fine
 class ifExpr : public expression{
 private:
   expression mCond;

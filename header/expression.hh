@@ -4,6 +4,9 @@
 #include<string>
 
 class expression{
+private:
+  std::string return_type;
+
 public:
   virtual ~expression() {}
 
