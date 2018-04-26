@@ -10,15 +10,17 @@
 
 class func{
 private:
-  std::unique_ptr<prototype> mProto;
-  std::vector<std::unique_ptr<expression> > mBody;
+  prototype mProto;
+  std::vector<expression> mBody;
 
 public:
-  func( std::unique_ptr<prototype>&& proto, std::vector<std::unique_ptr<expression> >&& body );
+  func( prototype proto, std::vector<expression> body );
 
-  std::string name() const;
+  std::string
+  name() const;
 
-  std::string generate() const;
+  std::string
+  generate() const;
 };
 
 #endif

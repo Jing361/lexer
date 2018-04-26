@@ -9,14 +9,15 @@
 class binary : public expression{
 private:
   std::string mOperator;
-  std::unique_ptr<expression> mLhs;
-  std::unique_ptr<expression> mRhs;
+  expression mLhs;
+  expression mRhs;
 
 public:
-  binary( const std::string& Operator, std::unique_ptr<expression>&& lhs,
-                                       std::unique_ptr<expression>&& rhs );
+  binary( const std::string& Operator, expression lhs,
+                                       expression rhs );
 
-  std::string generate() const override;
+  std::string
+  generate() const override;
 };
 
 #endif

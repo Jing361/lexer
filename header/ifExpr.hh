@@ -8,17 +8,19 @@
 
 class ifExpr : public expression{
 private:
-  std::unique_ptr<expression> mCond;
-  std::vector<std::unique_ptr<expression> > mThen;
-  std::vector<std::unique_ptr<expression> > mElse;
+  expression mCond;
+  std::vector<expression> mThen;
+  std::vector<expression> mElse;
   static unsigned int tmLabelCounter;
 
 public:
-  ifExpr( std::unique_ptr<expression>&& cond,
-          std::vector<std::unique_ptr<expression> >&& then,
-          std::vector<std::unique_ptr<expression> >&& kElse );
+  ifExpr( expression cond,
+          std::vector<expression> then,
+          std::vector<expression> kElse );
 
-  virtual std::string generate() const override;
+  virtual
+  std::string
+  generate() const override;
 };
 
 #endif

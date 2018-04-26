@@ -18,6 +18,22 @@ unique_ptr<expression> parser::log_error( const string& str ){
   return nullptr;
 }
 
+expression
+parser::parse_expression(){
+}
+
+void
+parser::parse_toplevel(){
+  while( mCurTok != mTokens.end() ){
+    mTopLevel.push_back( parse_expression() );
+    if( mCurTok->type != classification::SEMI ){
+      throw runtime_error( "Expected semicolon" );
+    } else {
+      ++mCurTok;
+    }
+  }
+}
+
 /*unique_ptr<expression> parser::parse_bin_op( int lhsPrec, unique_ptr<expression> lhs ){
   while( true ){
     int curPrec = getPrecedence();

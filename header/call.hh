@@ -10,15 +10,17 @@
 class call : public expression{
 private:
   std::string mCallee;
-  std::vector<std::unique_ptr<expression> > mArgs;
+  std::vector<expression> mArgs;
 
 public:
-  call( const std::string& callee, std::vector<std::unique_ptr<expression> >&& args );
+  call( const std::string& callee, std::vector<expression> args );
 
   /*!
    * @todo verify correct argument count(type?)
    */
-  virtual std::string generate() const override;
+  virtual
+  std::string
+  generate() const override;
 };
 
 #endif

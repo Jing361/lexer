@@ -15,7 +15,9 @@ private:
 public:
   variable( const std::string& name );
 
-  virtual std::string generate() const override;
+  virtual
+  std::string
+  generate() const override;
 };
 
 #endif

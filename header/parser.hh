@@ -21,16 +21,25 @@ private:
   decltype( mTokens )::iterator mCurTok;
   std::map<std::string, int> mOpPrecedence;
   std::vector<std::unique_ptr<func> > mDefs;
-  std::vector<std::unique_ptr<expression> > mTopLevels;
-  std::vector<std::unique_ptr<prototype> > mExterns;
+  std::vector<expression> mTopLevel;//'the program'
 
-  int getPrecedence();
+  int
+  getPrecedence();
 
-  std::unique_ptr<expression> log_error( const std::string& str );
+  std::unique_ptr<expression>
+  log_error( const std::string& str );
 
-  void handle_def();
-  void handle_extern();
-  void handle_top();
+  void
+  handle_def();
+  void
+  handle_extern();
+  void
+  handle_top();
+
+  expression
+  parse_expression();
+
+
 
 public:
 //TODO: maybe comma should be operator with high precedence?
@@ -50,7 +59,8 @@ public:
                      { "*",  80 }, { "/",  80 }, } ){
   }
 
-  void main_loop();
+  void
+  parse_toplevel();
 };
 
 #endif

@@ -7,7 +7,9 @@ class expression{
 public:
   virtual ~expression() {}
 
-  virtual std::string generate() const = 0;
+  virtual
+  std::string
+  generate() const{}
 };
 
 #endif

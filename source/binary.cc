@@ -2,8 +2,8 @@
 
 using namespace std;
 
-binary::binary( const string& Operator, unique_ptr<expression>&& lhs,
-                                        unique_ptr<expression>&& rhs ):
+binary::binary( const string& Operator, expression lhs,
+                                        expression rhs ):
   mOperator( Operator ),
   mLhs( move( lhs ) ),
   mRhs( move( rhs ) ){
@@ -12,8 +12,8 @@ binary::binary( const string& Operator, unique_ptr<expression>&& lhs,
 string binary::generate() const{
   string instructions;
 
-  instructions += mLhs->generate();
-  instructions += mRhs->generate();
+  instructions += mLhs.generate();
+  instructions += mRhs.generate();
 
   if( mOperator == "+" ){
     instructions += "add\n";

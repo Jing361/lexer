@@ -13,7 +13,9 @@ private:
 public:
   number( double val );
 
-  virtual std::string generate() const override;
+  virtual
+  std::string
+  generate() const override;
 };
 
 #endif

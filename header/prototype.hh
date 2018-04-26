@@ -12,7 +12,8 @@ private:
 public:
   prototype( const std::string& name, std::vector<std::string>&& args );
 
-  std::string name() const;
+  std::string
+  name() const;
 };
 
 #endif
