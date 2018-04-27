@@ -24,13 +24,16 @@ int main(){
 
   lexer luthor( preprocess( text ) );
 
-  cout << "original:" << endl;
+/*  cout << "original:" << endl;
   cout << text << endl;
   cout << endl;
   cout << "parsed:" << endl;
   for( auto token : luthor ){
-    cout << token.lexeme;
-  }
+    cout << token.lexeme << endl;
+  }*/
+
+  parser p( luthor.begin(), luthor.end() );
+  p.parse_toplevel();
 
   return 0;
 }

@@ -12,12 +12,19 @@ lexer::lexer( const std::string& text )
 
 void
 lexer::lex(){
+  int line_number = 1;
+
   while( mIter != mText.end() ){
     if( *mIter == ' ' || *mIter == '\r' || *mIter == '\n' ){
+      if( *mIter == '\r' || *mIter == '\n' ){
+        ++line_number;
+      }
+
       ++mIter;
+
       continue;
     } else if( is_digit( *mIter ) ){
-      mTokens.emplace_back( classification::NUMBER, process_number() );
+      mTokens.emplace_back( classification::NUMBER, process_number(), line_number );
     } else if( is_alpha( *mIter ) || *mIter == '_' ){
       string lexeme( 1, *mIter++ );
 
@@ -26,13 +33,13 @@ lexer::lex(){
       }
 
       if( lexeme == "if" ){
-        mTokens.emplace_back( classification::IF, lexeme );
+        mTokens.emplace_back( classification::IF, lexeme, line_number );
       } else if( lexeme == "else" ){
-        mTokens.emplace_back( classification::ELSE, lexeme );
+        mTokens.emplace_back( classification::ELSE, lexeme, line_number );
       } else if( lexeme == "extern" ){
-        mTokens.emplace_back( classification::EXTERN, lexeme );
+        mTokens.emplace_back( classification::EXTERN, lexeme, line_number );
       } else {
-        mTokens.emplace_back( classification::IDENTIFIER, lexeme );
+        mTokens.emplace_back( classification::IDENTIFIER, lexeme, line_number );
       }
     } else if( *mIter == '"' ){
       string lexeme( 1, *mIter++ );
@@ -42,33 +49,33 @@ lexer::lex(){
       }
       ++mIter;
 
-      mTokens.emplace_back( classification::STRING, lexeme );
+      mTokens.emplace_back( classification::STRING, lexeme, line_number );
     } else if( *mIter == ',' ){
-      mTokens.emplace_back( classification::COMMA,    string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::COMMA,    string( 1, *mIter++ ), line_number );
     } else if( *mIter == '*' ){
-      mTokens.emplace_back( classification::STAR,     string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::STAR,     string( 1, *mIter++ ), line_number );
     } else if( *mIter == '/' ){
-      mTokens.emplace_back( classification::SLASH,    string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::SLASH,    string( 1, *mIter++ ), line_number );
     } else if( *mIter == '+' ){
-      mTokens.emplace_back( classification::PLUS,     string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::PLUS,     string( 1, *mIter++ ), line_number );
     } else if( *mIter == '-' ){
-      mTokens.emplace_back( classification::MINUS,    string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::MINUS,    string( 1, *mIter++ ), line_number );
     } else if( *mIter == '(' ){
-      mTokens.emplace_back( classification::LPAREN,   string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::LPAREN,   string( 1, *mIter++ ), line_number );
     } else if( *mIter == ')' ){
-      mTokens.emplace_back( classification::RPAREN,   string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::RPAREN,   string( 1, *mIter++ ), line_number );
     } else if( *mIter == '[' ){
-      mTokens.emplace_back( classification::LBRACKET, string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::LBRACKET, string( 1, *mIter++ ), line_number );
     } else if( *mIter == ']' ){
-      mTokens.emplace_back( classification::RBRACKET, string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::RBRACKET, string( 1, *mIter++ ), line_number );
     } else if( *mIter == '{' ){
-      mTokens.emplace_back( classification::LBRACE,   string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::LBRACE,   string( 1, *mIter++ ), line_number );
     } else if( *mIter == '}' ){
-      mTokens.emplace_back( classification::RBRACE,   string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::RBRACE,   string( 1, *mIter++ ), line_number );
     } else if( *mIter == ';' ){
-      mTokens.emplace_back( classification::SEMI,   string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::SEMI,   string( 1, *mIter++ ), line_number );
     } else if( *mIter == '=' ){
-      mTokens.emplace_back( classification::EQUAL,   string( 1, *mIter++ ) );
+      mTokens.emplace_back( classification::EQUAL,   string( 1, *mIter++ ), line_number );
     } else {
       throw runtime_error( string( "Invalid token: " ) + string( 1, *mIter ) );
     }

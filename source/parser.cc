@@ -1,3 +1,4 @@
+#include<sstream>
 #include<iostream>
 #include<string>
 
@@ -165,7 +166,14 @@ parser::parse_toplevel(){
     mTopLevel.push_back( parse_expression() );
 
     if( mCurTok->type != classification::SEMI ){
-      throw runtime_error( "Expected semicolon after expression" );
+      string row;
+      string column;
+
+      stringstream ss;
+      ss << mCurTok->location.first;
+      ss >> row;
+
+      throw runtime_error( string( "Expected semicolon after expression " ) + row );
     } else {
       ++mCurTok;
     }
