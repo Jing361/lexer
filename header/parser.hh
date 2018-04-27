@@ -18,8 +18,6 @@
 // all expression variables will need to be pointers for polymorphism
 class parser{
 private:
-  using expr_ptr = std::unique_ptr<expression>;
-
   std::vector<token> mTokens;
   decltype( mTokens )::iterator mCurTok;
   std::map<std::string, int> mOpPrecedence;
@@ -56,6 +54,9 @@ private:
 
   expr_ptr
   parse_branch();
+
+  std::vector<expr_ptr>
+  parse_brackets();
 
 public:
 //TODO: maybe comma should be operator with high precedence?

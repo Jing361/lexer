@@ -10,7 +10,7 @@ number::number( double val ):
 
 number::number( std::string val ){
   stringstream ss( val );
-  ss >> mValue
+  ss >> mValue;
 }
 
 string number::generate() const{

@@ -54,11 +54,13 @@ parser::parse_primary(){
 
 expr_ptr
 parser::parse_paren(){
-  parse_expression();
+  auto E = parse_expression();
 
   if( mCurTok->type != classification::RPAREN ){
     throw runtime_error( "Expected ')'" );
   }
+
+  return E;
 }
 
 expr_ptr
@@ -70,7 +72,7 @@ parser::parse_binary( int lhs_precedence, expr_ptr lhs ){
       return lhs;
     }
 
-    string op = mCurTok->tok;
+    string op = mCurTok->lexeme;
 
     ++mCurTok;
 
@@ -111,8 +113,11 @@ parser::parse_identifier(){
     }
 
     ++mCurTok;
+
+    return make_unique<call>( ident, move( args ) );
   } else if( mCurTok->type == classification::IDENTIFIER ){
     // Declaration
+    return make_unique<variable>( ident );
   } else {
     // just variable usage
     return make_unique<variable>( ident );
@@ -121,19 +126,39 @@ parser::parse_identifier(){
 
 expr_ptr
 parser::parse_branch(){
-  if( ++mCurTok++->type != classification::LPAREN ){
+  if( (++mCurTok)->type != classification::LPAREN ){
     throw runtime_error( "Expected '(' after 'if'" );
   }
+  ++mCurTok;
 
   auto condition = parse_expression();
-  auto true_br = parse_expression();
+  auto true_br = parse_brackets();
 
-  if( mCurtok->type == classification::ELSE ){
-    return make_unique<ifExpr>( condition, true_br, parse_expression() );
+  if( mCurTok->type == classification::ELSE ){
+    return make_unique<ifExpr>( move( condition ), move( true_br ), parse_brackets() );
   } else {
-    return make_unique<ifExpr>( condition, true_br );
+    return make_unique<ifExpr>( move( condition ), move( true_br ) );
   }
 }
+
+std::vector<expr_ptr>
+parser::parse_brackets(){
+  bool bracket;
+
+  if( mCurTok->type == classification::LBRACKET ){
+    ++mCurTok;
+    bracket = true;
+  }
+
+  vector<expr_ptr> exprs;
+
+  do{
+    exprs.emplace_back( parse_expression() );
+  } while( bracket && mCurTok->type != classification::RBRACKET );
+
+  return exprs;
+}
+
 void
 parser::parse_toplevel(){
   while( mCurTok != mTokens.end() ){
