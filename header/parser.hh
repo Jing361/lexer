@@ -15,18 +15,21 @@
 #include"shared.hh"
 #include"ifExpr.hh"
 
+// all expression variables will need to be pointers for polymorphism
 class parser{
 private:
+  using expr_ptr = std::unique_ptr<expression>;
+
   std::vector<token> mTokens;
   decltype( mTokens )::iterator mCurTok;
   std::map<std::string, int> mOpPrecedence;
   std::vector<std::unique_ptr<func> > mDefs;
-  std::vector<expression> mTopLevel;//'the program'
+  std::vector<expr_ptr> mTopLevel;//'the program'
 
   int
   getPrecedence();
 
-  std::unique_ptr<expression>
+  expr_ptr
   log_error( const std::string& str );
 
   void
@@ -36,10 +39,17 @@ private:
   void
   handle_top();
 
-  expression
+  expr_ptr
   parse_expression();
 
+  expr_ptr
+  parse_primary();
 
+  expr_ptr
+  parse_paren();
+
+  expr_ptr
+  parse_binary();
 
 public:
 //TODO: maybe comma should be operator with high precedence?
