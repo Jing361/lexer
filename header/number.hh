@@ -12,6 +12,7 @@ private:
 
 public:
   number( double val );
+  number( std::string val );
 
   virtual
   std::string
