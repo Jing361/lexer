@@ -49,7 +49,13 @@ private:
   parse_paren();
 
   expr_ptr
-  parse_binary();
+  parse_binary( int lhs_precedence, expr_ptr lhs );
+
+  expr_ptr
+  parse_identifier();
+
+  expr_ptr
+  parse_branch();
 
 public:
 //TODO: maybe comma should be operator with high precedence?
