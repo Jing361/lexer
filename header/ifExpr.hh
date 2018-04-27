@@ -17,7 +17,7 @@ private:
 public:
   ifExpr( expression cond,
           std::vector<expression> then,
-          std::vector<expression> kElse );
+          std::vector<expression> kElse = nullptr );
 
   virtual
   std::string
