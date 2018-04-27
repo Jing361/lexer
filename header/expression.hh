@@ -1,6 +1,7 @@
 #ifndef __EXPRESSION_HH__
 #define __EXPRESSION_HH__
 
+#include<memory>
 #include<string>
 
 class expression{
@@ -12,8 +13,10 @@ public:
 
   virtual
   std::string
-  generate() const{}
+  generate() const = 0;
 };
+
+using expr_ptr = std::unique_ptr<expression>;
 
 #endif
 

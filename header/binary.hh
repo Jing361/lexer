@@ -9,12 +9,12 @@
 class binary : public expression{
 private:
   std::string mOperator;
-  expression mLhs;
-  expression mRhs;
+  expr_ptr mLhs;
+  expr_ptr mRhs;
 
 public:
-  binary( const std::string& Operator, expression lhs,
-                                       expression rhs );
+  binary( const std::string& Operator, expr_ptr lhs,
+                                       expr_ptr rhs );
 
   std::string
   generate() const override;

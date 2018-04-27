@@ -10,10 +10,10 @@
 class call : public expression{
 private:
   std::string mCallee;
-  std::vector<expression> mArgs;
+  std::vector<expr_ptr> mArgs;
 
 public:
-  call( const std::string& callee, std::vector<expression> args );
+  call( const std::string& callee, std::vector<expr_ptr> args );
 
   /*!
    * @todo verify correct argument count(type?)

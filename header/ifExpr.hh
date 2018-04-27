@@ -9,15 +9,15 @@
 // if expressions are more statements, but this is fine
 class ifExpr : public expression{
 private:
-  expression mCond;
-  std::vector<expression> mThen;
-  std::vector<expression> mElse;
+  expr_ptr mCond;
+  std::vector<expr_ptr> mThen;
+  std::vector<expr_ptr> mElse;
   static unsigned int tmLabelCounter;
 
 public:
-  ifExpr( expression cond,
-          std::vector<expression> then,
-          std::vector<expression> kElse = nullptr );
+  ifExpr( expr_ptr cond,
+          std::vector<expr_ptr> then,
+          std::vector<expr_ptr> kElse = std::vector<expr_ptr>() );
 
   virtual
   std::string
