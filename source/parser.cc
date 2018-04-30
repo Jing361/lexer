@@ -16,12 +16,6 @@ parser::getPrecedence(){
 }
 
 expr_ptr
-parser::log_error( const string& str ){
-  cout << "Log Error: " << str << endl;
-  return nullptr;
-}
-
-expr_ptr
 parser::parse_expression(){
   return parse_binary( 0, parse_primary() );
 }
@@ -55,6 +49,8 @@ parser::parse_primary(){
 
 expr_ptr
 parser::parse_paren(){
+  ++mCurTok;
+
   auto E = parse_expression();
 
   if( mCurTok->type != classification::RPAREN ){

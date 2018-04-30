@@ -15,7 +15,6 @@
 #include"shared.hh"
 #include"ifExpr.hh"
 
-// all expression variables will need to be pointers for polymorphism
 class parser{
 private:
   std::vector<token> mTokens;
@@ -26,16 +25,6 @@ private:
 
   int
   getPrecedence();
-
-  expr_ptr
-  log_error( const std::string& str );
-
-  void
-  handle_def();
-  void
-  handle_extern();
-  void
-  handle_top();
 
   expr_ptr
   parse_expression();
