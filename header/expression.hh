@@ -9,6 +9,10 @@ private:
   std::string return_type;
 
 public:
+  expression( const std::string& type )
+    : return_type( type ){
+  }
+
   virtual ~expression() {}
 
   virtual

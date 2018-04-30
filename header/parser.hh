@@ -26,26 +26,84 @@ private:
   int
   getPrecedence();
 
+  stmnt_ptr
+  parse_prog_statement();
+
+  stmnt_ptr
+  parse_variable_declaration();
+
+  stmnt_ptr
+  parse_function_declaration();
+
+  stmnt_ptr
+  parse_type();
+
+  stmnt_ptr
+  parse_qualifiers();
+
+  stmnt_ptr
+  parse_typename();
+
+  stmnt_ptr
+  parse_type_spec();
+
+  stmnt_ptr
+  parse_identifier();
+
+  stmnt_ptr
+  parse_initialization();
+
+  stmnt_ptr
+  parse_param_list();
+
+  stmnt_ptr
+  parse_param();
+
+  stmnt_ptr
+  parse_non_digit_ident_char();
+
+  stmnt_ptr
+  parse_ident_char();
+
+  stmnt_ptr
+  parse_integer();
+
+  stmnt_ptr
+  parse_number();
+
+  expr_ptr
+  parse_value();
+
+  stmnt_ptr
+  parse_statement();
+
+  stmnt_ptr
+  parse_arg_list();
+
+  stmnt_ptr
+  parse_arg();
+
+  stmnt_ptr
+  parse_function_definition();
+
+  stmnt_ptr
+  parse_branch();
+
+  stmnt_ptr
+  parse_for();
+
+  stmnt_ptr
+  parse_while();
+
+  std::vector<expr_ptr>
+  stmnt_ptr
+  parse_block();
+
   expr_ptr
   parse_expression();
 
   expr_ptr
-  parse_primary();
-
-  expr_ptr
-  parse_paren();
-
-  expr_ptr
   parse_binary( int lhs_precedence, expr_ptr lhs );
-
-  expr_ptr
-  parse_identifier();
-
-  expr_ptr
-  parse_branch();
-
-  std::vector<expr_ptr>
-  parse_brackets();
 
 public:
 //TODO: maybe comma should be operator with high precedence?
