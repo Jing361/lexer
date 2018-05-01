@@ -38,6 +38,8 @@ lexer::lex(){
         mTokens.emplace_back( classification::ELSE, lexeme, line_number );
       } else if( lexeme == "extern" ){
         mTokens.emplace_back( classification::EXTERN, lexeme, line_number );
+      } else if( lexeme == "typedef" ){
+        mTokens.emplace_back( classification::TYPEDEF, lexeme, line_number );
       } else {
         mTokens.emplace_back( classification::IDENTIFIER, lexeme, line_number );
       }
