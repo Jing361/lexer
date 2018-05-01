@@ -1,6 +1,6 @@
 #include<stdexcept>
 
-#include"lexer.hh"
+#include<lexer.hh>
 
 using namespace std;
 

@@ -5,8 +5,8 @@
 #include<string>
 #include<vector>
 
-#include"expression.hh"
-#include"prototype.hh"
+#include<expression.hh>
+#include<prototype.hh>
 
 class func{
 private:

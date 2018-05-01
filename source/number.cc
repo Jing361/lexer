@@ -1,6 +1,6 @@
 #include<sstream>
 
-#include"number.hh"
+#include<number.hh>
 
 using namespace std;
 

@@ -5,25 +5,23 @@
 #include<string>
 #include<set>
 
-#include<statement.hh>
-
 using qualifier = std::string;
 
-class type : public statement{
+class type{
 private:
   std::string mTypename;
-  std::set<qualifer> mQualifiers;
+  std::set<qualifier> mQualifiers;
 
 public:
   type( const std::string& name,
-        const std::set<qualifier>& quals = std::set<qualifer>{} );
+        const std::set<qualifier>& quals = std::set<qualifier>{} );
 
   std::string
   type_name() const;
 };
 
-using type_ptr = unique_ptr<type>;
-using make_type = make_unique<type>;
+using type_ptr = std::unique_ptr<type>;
+//extern const decltype( std::make_unique<type> )& make_type;
 
 #endif
 

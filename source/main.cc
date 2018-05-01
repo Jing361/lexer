@@ -3,8 +3,8 @@
 #include<vector>
 #include<iostream>
 
-#include"lexer.hh"
-#include"parser.hh"
+#include<lexer.hh>
+#include<parser.hh>
 
 using namespace std;
 

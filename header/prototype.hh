@@ -20,8 +20,8 @@ public:
   name() const;
 };
 
-using proto_ptr = unique_ptr<prototype>;
-using make_proto = make_unique<prototype>;
+using proto_ptr = std::unique_ptr<prototype>;
+//extern const decltype( std::make_unique<prototype> )& make_proto;
 
 #endif
 

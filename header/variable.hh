@@ -1,24 +1,28 @@
 #ifndef __VARIABLE_HH__
 #define __VARIABLE_HH__
 
+#include<memory>
 #include<string>
 #include<map>
 
-#include"expression.hh"
+#include<expression.hh>
+#include<type.hh>
 
 class variable : public expression{
 private:
   std::string mName;
-  static std::map<std::string, unsigned int> tmVariables;
-  static unsigned int tmNextAddress;
+  type mType;
 
 public:
-  variable( const std::string& name );
+  variable( type t, const std::string& name );
 
   virtual
   std::string
   generate() const override;
 };
+
+using var_ptr = unique_ptr<variable>;
+using make_var = make_unique<variable>;
 
 #endif
 

@@ -1,6 +1,8 @@
 #ifndef __FOR_HH__
 #define __FOR_HH__
 
+#include<vector>
+
 #include<statement.hh>
 #include<expression.hh>
 
@@ -18,8 +20,8 @@ public:
             const std::vector<> block );
 };
 
-using for_ptr = unique_ptr<for_loop>;
-using make_for = make_unique<for_loop>;
+using for_ptr = std::unique_ptr<for_loop>;
+//extern const decltype( std::make_unique<for_loop> )& make_for;
 
 #endif
 

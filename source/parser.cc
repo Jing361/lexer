@@ -2,7 +2,7 @@
 #include<iostream>
 #include<string>
 
-#include"parser.hh"
+#include<parser.hh>
 
 using namespace std;
 
@@ -46,42 +46,6 @@ parser::parse_paren(){
   return E;
 }
 
-expr_ptr
-parser::parse_identifier(){
-  string ident = mCurTok++->lexeme;
-
-  if( mCurTok->type == classification::LPAREN ){
-    // function call
-    ++mCurTok;
-    vector<expr_ptr> args;
-    bool args_done = false;
-
-    //get args
-    while( mCurTok->type != classification::RPAREN && !args_done ){
-      args.push_back( parse_expression() );
-
-      if( mCurTok->type == classification::RPAREN ){
-        args_done = true;
-      } else if( mCurTok->type == classification::COMMA ){
-      } else {
-        throw runtime_error( "Expected either ',' or ')' for function call" );
-      }
-
-      ++mCurTok;
-    }
-
-    ++mCurTok;
-
-    return make_unique<call>( ident, move( args ) );
-  } else if( mCurTok->type == classification::IDENTIFIER ){
-    // Declaration
-    return make_unique<variable>( ident );
-  } else {
-    // just variable usage
-    return make_unique<variable>( ident );
-  }
-}
-
 void
 parser::parse_toplevel(){
   while( mCurTok != mTokens.end() ){
@@ -118,13 +82,15 @@ parser::parse_prog_statement(){
   parse_function_declaration();
 }
 
-stmnt_ptr
+expr_ptr
 parser::parse_variable_declaration(){
   //extern?
-  parse_type();
-  parse_identifier();
-  '['integer']'
-  parse_initialization();
+  type t = parse_type();
+  string s = parse_identifier();
+  //'['integer']'
+  //parse_initialization();
+
+  return make_var( t, s );
 }
 
 stmnt_ptr
@@ -188,10 +154,6 @@ parser::parse_typename(){
 
 stmnt_ptr
 parser::parse_type_spec(){
-  if( mCurTok->lexeme != "typedef" ){
-    throw runtime_error( "Expected type specification" );
-  }
-
   parse_identifier();
   parse_type();
 }
@@ -268,17 +230,15 @@ parser::parse_value(){
 stmnt_ptr
 parser::parse_statement(){
   if( mCurTok->type == classification::IDENTIFIER ){
-    if( mCurTok->lexeme == "typedef" ){
-      return parse_type_spec();
-    } else {
-      return parse_variable_declaration();
-    }
+    return parse_variable_declaration();
   } else if( mCurTok->type == classification::IF ){
     return parse_branch();
   } else if( mCurTok->type == classification::FOR ){
     return parse_for();
   } else if( mCurTok->type == classification::WHILE ){
     return parse_while();
+  } else if( mCurTok->type == classification::TYPEDEF ){
+    return parse_type_spec();
   } else {
     throw runtime_error( "Could not parse statement" );
   }
@@ -408,7 +368,7 @@ parser::parse_brackets(){
   vector<expr_ptr> exprs;
 
   do{
-    exprs.emplace_back( parse_expression() );
+    exprs.emplace_back( parse_stuff() );
   } while( bracket && mCurTok->type != classification::RBRACKET );
 
   return exprs;
@@ -416,7 +376,6 @@ parser::parse_brackets(){
 
 
 //! @todo expression parsing needs fixing
-// look for ')', and handle different expressions
 expr_ptr
 parser::parse_expression(){
   bool paren;
@@ -426,7 +385,13 @@ parser::parse_expression(){
     paren = true;
   }
 
-  return parse_binary( 0, parse_primary() );
+  auto E = parse_binary( 0, parse_primary() );
+
+  if( paren && mCurTok->type != classification::RPAREN ){
+    throw runtime_error( "Expected ')'" );
+  }
+
+  return E;
 }
 
 expr_ptr
@@ -442,7 +407,7 @@ parser::parse_binary( int lhs_precedence, expr_ptr lhs ){
 
     ++mCurTok;
 
-    auto rhs = parse_primary();
+    auto rhs = expression();
 
     int next_precedence = getPrecedence();
 
@@ -451,6 +416,29 @@ parser::parse_binary( int lhs_precedence, expr_ptr lhs ){
     }
 
     lhs = make_unique<binary>( op, move( lhs ), move( rhs ) );
+  }
+}
+
+expr_ptr
+parser::parse_stuff(){
+  switch( mCurTok->type ){
+  case classification::IF:
+  case classification::FOR:
+  case classification::WHILE:
+  case classification::TYPEDEF:
+    return parse_statement();
+    break;
+
+  default:
+    auto next_tok = mCurTok;
+    ++next_tok;
+
+    if( next_tok->type == classification::IDENTIFIER ){
+      return parse_statement();
+    } else {
+      return parse_expression();
+    }
+    break;
   }
 }
 

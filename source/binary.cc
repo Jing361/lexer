@@ -1,12 +1,13 @@
-#include"binary.hh"
+#include<binary.hh>
 
 using namespace std;
 
 binary::binary( const string& Operator, expr_ptr lhs,
-                                        expr_ptr rhs ):
-  mOperator( Operator ),
-  mLhs( move( lhs ) ),
-  mRhs( move( rhs ) ){
+                                        expr_ptr rhs )
+  : base( "placeholder" )
+  , mOperator( Operator )
+  , mLhs( move( lhs ) )
+  , mRhs( move( rhs ) ){
 }
 
 string binary::generate() const{
@@ -27,4 +28,6 @@ string binary::generate() const{
 
   return instructions;
 }
+
+//const decltype( std::make_unique<binary> )& make_bin = std::make_unique<binary>;
 

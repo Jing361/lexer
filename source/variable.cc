@@ -1,9 +1,10 @@
-#include"variable.hh"
+#include<variable.hh>
 
 using namespace std;
 
-variable::variable( const string& name ):
-  mName( name ){
+variable::variable( type t, const std::string& name )
+  : mType( t )
+  , mName( name ){
 }
 
 string variable::generate() const{

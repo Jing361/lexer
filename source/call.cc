@@ -1,8 +1,8 @@
-#include"call.hh"
+#include<call.hh>
 
 using namespace std;
 
-call::call( const string& callee, vector<expr_ptr> args ):
+call::call( const string& callee, vector<expr_ptr>&& args ):
   mCallee( callee ),
   mArgs( move( args ) ){
 }

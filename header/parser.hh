@@ -7,14 +7,14 @@
 #include<string>
 
 #include<type.hh>
-#include"call.hh"
-#include"number.hh"
-#include"variable.hh"
-#include"binary.hh"
-#include"prototype.hh"
-#include"function.hh"
-#include"shared.hh"
-#include"ifExpr.hh"
+#include<call.hh>
+#include<number.hh>
+#include<variable.hh>
+#include<binary.hh>
+#include<prototype.hh>
+#include<function.hh>
+#include<shared.hh>
+#include<ifExpr.hh>
 
 class parser{
 private:
@@ -99,6 +99,10 @@ private:
 
   expr_ptr
   parse_binary( int lhs_precedence, expr_ptr lhs );
+
+  // temp name?
+  expr_ptr
+  parse_stuff();
 
 public:
 //TODO: maybe comma should be operator with high precedence?

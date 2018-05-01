@@ -23,6 +23,7 @@ enum class classification{
   ELSE,
   EXTERN,
   TYPE,
+  TYPEDEF,
   MINUS,
   PLUS,
   STAR,

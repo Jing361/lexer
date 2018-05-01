@@ -1,4 +1,4 @@
-#include"function.hh"
+#include<function.hh>
 
 using namespace std;
 
