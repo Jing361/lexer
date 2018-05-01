@@ -6,12 +6,6 @@
 
 using namespace std;
 
-int
-expr_ptr
-parser::parse_expression(){
-  return parse_binary( 0, parse_primary() );
-}
-
 // primary expressions include literals ( "string literal", 'C', 42, 6.9,
 // true, etc ) and identifiers ( x in x + 2 )
 expr_ptr
@@ -347,37 +341,59 @@ parser::parse_branch(){
 
 stmnt_ptr
 parser::parse_for(){
-  if( (++mCurTok)->type != classification::LPAREN ){
+  if( mCurTok->type != classification::FOR ){
+    throw runtime_error( "Expected 'for'" );
+  }
+
+  ++mCurTok;
+
+  if( mCurTok->type != classification::LPAREN ){
     throw runtime_error( "Expected '(' after 'for'" );
   }
+
   ++mCurtok;
 
-  parse_statement();
-  if( not ';' )
-  throw;
-  else
-  ++mCurTok; ';'
+  stmnt_ptr init = parse_statement();
+  if( mCurTok->type != classification::SEMI ){
+    throw runtime_error( "Expected ';' after for loop initialization" );
+  }
 
-  parse_expression();
-  if( not ';' )
-  throw;
-  else
-  ++mCurTok; ';'
+  ++mCurTok;
 
-  parse_statement();
-  if( not ';' )
-  throw;
-  else
-  ++mCurTok; ';'
+  expr_ptr cond = parse_expression();
+  if( mCurTok->type != classification::SEMI ){
+    throw runtime_error( "Expected ';' after for loop conditional" );
+  }
 
-  parse_brackets();
+  ++mCurTok;
+
+  stmnt_ptr cntrl = parse_statement();
+  if( mCurTok->type != classification::SEMI ){
+    throw runtime_error( "Expected ';' after for loop control" );
+  }
+
+  ++mCurTok;
+
+  if( (++mCurTok)->type != classification::RPAREN ){
+    throw runtime_error( "Expected ')' after for loop parameters" );
+  }
+
+  ++mCurtok;
+
+  return make_for( init, cond, cntrl, parse_brackets() );
 }
 
-stmnt_ptr
+while_ptr
 parser::parse_while(){
-  'while'
-  parse_expression();
-  parse_brackets();
+  if( mCurTok->type != classification::WHILE ){
+    throw runtime_error( "Expected 'while'" );
+  }
+
+  ++mCurTok;
+
+  expr_ptr condition = parse_expression();
+
+  return make_while( condition, parse_brackets() );
 }
 
 std::vector<expr_ptr>
@@ -399,8 +415,18 @@ parser::parse_brackets(){
 }
 
 
+//! @todo expression parsing needs fixing
+// look for ')', and handle different expressions
 expr_ptr
 parser::parse_expression(){
+  bool paren;
+
+  if( mCurTok->type == classification::LPAREN ){
+    ++mCurTok;
+    paren = true;
+  }
+
+  return parse_binary( 0, parse_primary() );
 }
 
 expr_ptr

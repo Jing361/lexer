@@ -5,9 +5,11 @@
 #include<string>
 #include<set>
 
+#include<statement.hh>
+
 using qualifier = std::string;
 
-class type : statement{
+class type : public statement{
 private:
   std::string mTypename;
   std::set<qualifer> mQualifiers;
