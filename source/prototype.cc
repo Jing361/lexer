@@ -2,9 +2,10 @@
 
 using namespace std;
 
-prototype::prototype( const string& name, vector<string>&& args ):
-  mName( name ),
-  mArgs( args ){
+prototype::prototype( type ret, const std::string& name, std::vector<type>&& args )
+  : mReturn( ret )
+  , mName( name )
+  , mArgs( args ){
 }
 
 string prototype::name() const{

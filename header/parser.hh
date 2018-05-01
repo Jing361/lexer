@@ -6,6 +6,7 @@
 #include<map>
 #include<string>
 
+#include<type.hh>
 #include"call.hh"
 #include"number.hh"
 #include"variable.hh"
@@ -35,11 +36,11 @@ private:
   stmnt_ptr
   parse_function_declaration();
 
-  stmnt_ptr
+  type_ptr
   parse_type();
 
   stmnt_ptr
-  parse_qualifiers();
+  parse_qualifier();
 
   stmnt_ptr
   parse_typename();
@@ -56,14 +57,8 @@ private:
   stmnt_ptr
   parse_param_list();
 
-  stmnt_ptr
+  type
   parse_param();
-
-  stmnt_ptr
-  parse_non_digit_ident_char();
-
-  stmnt_ptr
-  parse_ident_char();
 
   stmnt_ptr
   parse_integer();
@@ -77,10 +72,10 @@ private:
   stmnt_ptr
   parse_statement();
 
-  stmnt_ptr
+  std::vector<expr_ptr>
   parse_arg_list();
 
-  stmnt_ptr
+  expr_ptr
   parse_arg();
 
   stmnt_ptr

@@ -126,7 +126,7 @@ parser::parse_prog_statement(){
 
 stmnt_ptr
 parser::parse_variable_declaration(){
-  extern
+  //extern?
   parse_type();
   parse_identifier();
   '['integer']'
@@ -135,75 +135,123 @@ parser::parse_variable_declaration(){
 
 stmnt_ptr
 parser::parse_function_declaration(){
-  extern
-  parse_type();
-  parse_identifier();
-  '('
-  parse_param_list();
-  ')'
+  //extern?
+  
+  type return_type = parse_type();
+  identifier name = parse_identifier();
+
+  if( mCurTok->type != classification::LPAREN ){
+    throw runtime_error( "Expected '(' after function prototype name" );
+  }
+
+  ++mCurTok;
+
+  vector<type> params = parse_param_list();
+
+  if( mCurTok->type != classification::LPAREN ){
+    throw runtime_error( "Expected ')' after function prototype parameter list" );
+  }
+
+  ++mCurTok;
+
+  return make_proto( return_type, name, params );
 }
 
-stmnt_ptr
+type_ptr
 parser::parse_type(){
-  parse_qualifiers();*
-  parse_typename();
-  '*'
+  set<qualifer> quals;
+  qualifer next;
+  
+  next = parse_qualifer();
+  while( next != "" ){
+    quals.insert( next );
+    next = parse_qualifer();
+  }
+
+  return make_type( parse_typename(), quals );
+  //pointers?
 }
 
-stmnt_ptr
-parser::parse_qualifiers(){
-  const
-  volatile
-  static
+qualifier
+parser::parse_qualifier(){
+  qualifer ret;
+
+  if( ret == "const"
+   || ret == "volatile"
+   || ret == "static" ){
+    ret = mCurTok->lexeme;
+
+    ++mCurTok;
+  }
+
+  return ret;
 }
 
 stmnt_ptr
 parser::parse_typename(){
-  parse_identifier();
+  return parse_identifier();
 }
 
 stmnt_ptr
 parser::parse_type_spec(){
-  typedef
+  if( mCurTok->lexeme != "typedef" ){
+    throw runtime_error( "Expected type specification" );
+  }
+
   parse_identifier();
   parse_type();
 }
 
 stmnt_ptr
 parser::parse_identifier(){
-  parse_non_digit_ident_char();
-  parse_ident_char();*
+  identifier ident = mCurTok->lexeme;
+  char first = ident[0];
+
+  if( first >= '0' && first <= '9' ){
+    throw runtime_error( "Expected non_digit character to start identifier" );
+  }
+
+  return ident;
 }
 
 stmnt_ptr
 parser::parse_initialization(){
-  '='
-  parse_value();
+/*  '='
+  parse_value();*/
 }
 
-stmnt_ptr
+vector<type> params;
 parser::parse_param_list(){
-  parse_param();
-  if( ',' )
-  parse_param_list();
+  vector<type> params;
+
+  type next = parse_param();
+  if( next.type_name() != "" ){
+    params.emplace_back( next );
+  }
+
+  // this can be implemented with recursion by using an if, and a recursive call
+  // chose not to implement recursively for performance
+  while( mCurTok->type == classification::COMMA ){
+    ++mCurTok;
+
+    next = parse_param();
+
+    if( next.type_name() == "" ){
+      throw runtime_error( "Error parsing parameter" );
+    }
+  }
+
+  return params;
 }
 
-stmnt_ptr
+type
 parser::parse_param(){
-  parse_type();
+  type t = parse_type();
+
+  //identifier is parsed for syntax
   parse_identifier();
-}
 
-stmnt_ptr
-parser::parse_non_digit_ident_char(){
-  [a-zA-Z_]
-}
-
-stmnt_ptr
-parser::parse_ident_char(){
-  parse_non_digit_ident_char();
-  or
-  parse_digit();
+  return t;
 }
 
 stmnt_ptr
@@ -225,25 +273,48 @@ parser::parse_value(){
 
 stmnt_ptr
 parser::parse_statement(){
-  parse_variable_declaration();
-  xor
-  parse_branch();
-  xor
-  parse_for();
-  xor
-  parse_while();
-  xor
-  parse_type_spec();
+  if( mCurTok->type == classification::IDENTIFIER ){
+    if( mCurTok->lexeme == "typedef" ){
+      return parse_type_spec();
+    } else {
+      return parse_variable_declaration();
+    }
+  } else if( mCurTok->type == classification::IF ){
+    return parse_branch();
+  } else if( mCurTok->type == classification::FOR ){
+    return parse_for();
+  } else if( mCurTok->type == classification::WHILE ){
+    return parse_while();
+  } else {
+    throw runtime_error( "Could not parse statement" );
+  }
 }
 
-stmnt_ptr
+vector<expr_ptr>
 parser::parse_arg_list(){
-  parse_arg();
-  if( ',' )
-  parse_arg_list();
+  vector<expr_ptr> args;
+
+  type next = parse_arg();
+  if( next.type_name() != "" ){
+    args.emplace_back( next );
+  }
+
+  // this can be implemented with recursion by using an if, and a recursive call
+  // chose not to implement recursively for performance
+  while( mCurTok->type == classification::COMMA ){
+    ++mCurTok;
+
+    next = parse_arg();
+
+    if( next.type_name() == "" ){
+      throw runtime_error( "Error parsing argument" );
+    }
+  }
+
+  return args;
 }
 
-stmnt_ptr
+expr_ptr
 parser::parse_arg(){
   parse_expression();
 }

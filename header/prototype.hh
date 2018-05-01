@@ -3,18 +3,25 @@
 
 #include<string>
 #include<vector>
+#include<memory>
 
-class prototype{
+#include<statement.hh>
+
+class prototype : public statement{
 private:
   std::string mName;
-  std::vector<std::string> mArgs;
+  std::vector<type> mArgs;
+  type mReturn;
 
 public:
-  prototype( const std::string& name, std::vector<std::string>&& args );
+  prototype( type ret, const std::string& name, std::vector<type>&& args );
 
   std::string
   name() const;
 };
+
+using proto_ptr = unique_ptr<prototype>;
+using make_proto = make_unique<prototype>;
 
 #endif
 

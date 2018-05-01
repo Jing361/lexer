@@ -4,9 +4,11 @@
 #include<memory>
 #include<string>
 
+#include<type.hh>
+
 class expression{
 private:
-  std::string return_type;
+  type return_type;
 
 public:
   expression( const std::string& type )
