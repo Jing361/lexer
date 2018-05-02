@@ -47,7 +47,7 @@ parser::parse_paren(){
 void
 parser::parse_toplevel(){
   while( mCurTok != mTokens.end() ){
-    mTopLevel.push_back( parse_expression() );
+    mTopLevel.push_back( parse_prog_statement() );
 
     if( mCurTok->type != classification::SEMI ){
       string row;
@@ -75,14 +75,34 @@ parser::getPrecedence(){
 
 stmnt_ptr
 parser::parse_prog_statement(){
-  parse_decl_stmnt();
-  parse_function_declaration();
+  if( mCurTok->type == classification::TYPEDEF 
+   || mCurTok->type == classification::EXTERN ){
+    return parse_decl_stmnt();
+  } else if( mCurTok->type == classification::IDENTIFIER ){
+    auto next = mCurTok;
+    ++next;
+
+    if( next->type == classification::IDENTIFIER ){
+      ++next;
+
+      if( next->type == classification::LPAREN ){
+        return parse_function_declaration();
+      } else {
+        return parse_decl_stmnt();
+      }
+    } else {
+      throw runtime_error( "Expected identifier" );
+    }
+  }
 }
 
 stmnt_ptr
 parser::parse_decl_stmnt(){
-  parse_variable_declaration();
-  parse_type_spec();
+  if( mCurTok->type == classification::TYPEDEF ){
+    return parse_type_spec();
+  } else {
+    return parse_variable_declaration();
+  }
 }
 
 //! @todo add array and initialization parsing
@@ -166,6 +186,8 @@ parser::identifier
 parser::parse_identifier(){
   string ident = mCurTok->lexeme;
   char first = ident[0];
+
+  ++mCurTok;
 
   if( first >= '0' && first <= '9' ){
     throw runtime_error( "Expected non_digit character to start identifier" );
