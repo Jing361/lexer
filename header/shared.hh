@@ -19,6 +19,8 @@ enum class classification{
   RBRACE,//}
   LBRACKET,//[
   RBRACKET,//]
+  FOR,
+  WHILE,
   IF,
   ELSE,
   EXTERN,

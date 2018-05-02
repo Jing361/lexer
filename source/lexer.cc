@@ -36,6 +36,10 @@ lexer::lex(){
         mTokens.emplace_back( classification::IF, lexeme, line_number );
       } else if( lexeme == "else" ){
         mTokens.emplace_back( classification::ELSE, lexeme, line_number );
+      } else if( lexeme == "for" ){
+        mTokens.emplace_back( classification::FOR, lexeme, line_number );
+      } else if( lexeme == "while" ){
+        mTokens.emplace_back( classification::WHILE, lexeme, line_number );
       } else if( lexeme == "extern" ){
         mTokens.emplace_back( classification::EXTERN, lexeme, line_number );
       } else if( lexeme == "typedef" ){
