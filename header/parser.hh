@@ -105,7 +105,7 @@ private:
   parse_while();
 
   std::vector<expr_ptr>
-  parse_brackets();
+  parse_braces();
 
   expr_ptr
   parse_expression();

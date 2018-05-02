@@ -36,6 +36,11 @@ parser::parse_primary(){
     return make_unique<variable>( type( "void" ), parse_identifier() );
   break;
 
+  // TEMP SOLUTION
+  case classification::SEMI:
+    ++mCurTok;
+    break;
+
   default:
     throw runtime_error( string( "Expected primary expression:" ) + error_tail() );
   break;
@@ -61,7 +66,7 @@ parser::parse_toplevel(){
     mTopLevel.push_back( parse_prog_statement() );
 
     if( mCurTok->type != classification::SEMI ){
-      throw runtime_error( string( "Expected semicolon after expression " ) + error_tail() );
+      //throw runtime_error( string( "Expected semicolon after expression " ) + error_tail() );
     } else {
       ++mCurTok;
     }
@@ -145,7 +150,7 @@ parser::parse_function_declaration(){
   if( mCurTok->type == classification::SEMI ){
     return make_unique<prototype>( return_type, name, move( params ) );
   } else {
-    return make_unique<func>( prototype( return_type, name, move( params ) ), parse_brackets() );
+    return make_unique<func>( prototype( return_type, name, move( params ) ), parse_braces() );
   }
 }
 
@@ -225,6 +230,8 @@ parser::parse_param_list(){
     ++mCurTok;
 
     next = parse_param();
+
+    params.emplace_back( next );
 
     if( next.type_name() == "" ){
       throw runtime_error( string( "Error parsing parameter:" ) + error_tail() );
@@ -313,7 +320,7 @@ parser::parse_arg(){
 stmnt_ptr
 parser::parse_function_definition(){
   parse_function_declaration();
-  parse_brackets();
+  parse_braces();
 }
 
 stmnt_ptr
@@ -327,10 +334,10 @@ parser::parse_branch(){
   if( mCurTok++->type != classification::RPAREN ){
     throw runtime_error( string( "Expected ')' after conditional:" ) + error_tail() );
   }
-  auto true_br = parse_brackets();
+  auto true_br = parse_braces();
 
   if( mCurTok->type == classification::ELSE ){
-    return make_unique<ifExpr>( move( condition ), move( true_br ), parse_brackets() );
+    return make_unique<ifExpr>( move( condition ), move( true_br ), parse_braces() );
   } else {
     return make_unique<ifExpr>( move( condition ), move( true_br ) );
   }
@@ -377,7 +384,7 @@ parser::parse_for(){
 
   ++mCurTok;
 
-  return make_unique<for_loop>( move( init ), move( cond ), move( cntrl ), move( parse_brackets() ) );
+  return make_unique<for_loop>( move( init ), move( cond ), move( cntrl ), move( parse_braces() ) );
 }
 
 while_ptr
@@ -390,23 +397,23 @@ parser::parse_while(){
 
   expr_ptr condition = parse_expression();
 
-  return make_unique<while_loop>( move( condition ), move( parse_brackets() ) );
+  return make_unique<while_loop>( move( condition ), move( parse_braces() ) );
 }
 
 std::vector<expr_ptr>
-parser::parse_brackets(){
-  bool bracket;
+parser::parse_braces(){
+  bool braces;
 
-  if( mCurTok->type == classification::LBRACKET ){
+  if( mCurTok->type == classification::LBRACE ){
     ++mCurTok;
-    bracket = true;
+    braces = true;
   }
 
   vector<expr_ptr> exprs;
 
   do{
     exprs.emplace_back( parse_stuff() );
-  } while( bracket && mCurTok->type != classification::RBRACKET );
+  } while( braces && mCurTok->type != classification::RBRACE );
 
   return exprs;
 }
