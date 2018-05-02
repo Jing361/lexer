@@ -142,7 +142,11 @@ parser::parse_function_declaration(){
 
   ++mCurTok;
 
-  return make_unique<prototype>( return_type, name, move( params ) );
+  if( mCurTok->type == classification::SEMI ){
+    return make_unique<prototype>( return_type, name, move( params ) );
+  } else {
+    return make_unique<func>( prototype( return_type, name, move( params ) ), parse_brackets() );
+  }
 }
 
 type

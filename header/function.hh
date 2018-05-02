@@ -8,13 +8,13 @@
 #include<expression.hh>
 #include<prototype.hh>
 
-class func{
+class func : public statement{
 private:
   prototype mProto;
-  std::vector<expression> mBody;
+  std::vector<expr_ptr> mBody;
 
 public:
-  func( prototype proto, std::vector<expression> body );
+  func( prototype proto, std::vector<expr_ptr>&& body );
 
   std::string
   name() const;

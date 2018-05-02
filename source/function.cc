@@ -2,7 +2,7 @@
 
 using namespace std;
 
-func::func( prototype proto, vector<expression> body ):
+func::func( prototype proto, vector<expr_ptr>&& body ):
   mProto( move( proto ) ),
   mBody( move( body ) ){
 }
@@ -15,7 +15,7 @@ string func::generate() const{
   string instructions( mProto.name() + ":\n" );
 
   for( unsigned int i = 0; i < mBody.size(); ++i ){
-    instructions += mBody[i].generate();
+    instructions += mBody[i]->generate();
   }
 
   return instructions + "return\n";
