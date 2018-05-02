@@ -35,6 +35,9 @@ private:
   std::vector<expr_ptr> mTopLevel;//'the program'
   std::stack<context> mContextStack;
 
+  std::string
+  error_tail();
+
   int
   getPrecedence();
 
