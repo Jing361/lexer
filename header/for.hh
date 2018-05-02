@@ -18,6 +18,9 @@ private:
 public:
   for_loop( stmnt_ptr initializer, expr_ptr cond, stmnt_ptr control,
             std::vector<expr_ptr>&& block );
+
+  std::string
+  generate() const{}
 };
 
 using for_ptr = std::unique_ptr<for_loop>;

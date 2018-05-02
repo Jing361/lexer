@@ -20,7 +20,7 @@ public:
   type_name() const;
 };
 
-using type_ptr = std::unique_ptr<type>;
+//using type_ptr = std::unique_ptr<type>;
 //extern const decltype( std::make_unique<type> )& make_type;
 
 #endif

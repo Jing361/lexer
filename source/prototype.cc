@@ -14,6 +14,6 @@ prototype::name() const{
 }
 
 string
-generate() const{
+prototype::generate() const{
 }
 

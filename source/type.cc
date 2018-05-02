@@ -2,7 +2,7 @@
 
 using namespace std;
 
-type::type( const string& name, const set<qualifiers>& quals )
+type::type( const string& name, const set<qualifier>& quals )
   : mTypename( name )
   , mQualifiers( quals ){
 }

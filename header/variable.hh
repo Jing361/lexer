@@ -5,10 +5,10 @@
 #include<string>
 #include<map>
 
-#include<expression.hh>
+#include<statement.hh>
 #include<type.hh>
 
-class variable : public expression{
+class variable : public statement{
 private:
   std::string mName;
   type mType;

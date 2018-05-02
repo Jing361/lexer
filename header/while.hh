@@ -3,17 +3,23 @@
 
 #include<vector>
 
+#include<expression.hh>
+#include<statement.hh>
+
 class while_loop : public statement{
 private:
   expr_ptr mCondition;
-  std::vector<> mBlock;
+  std::vector<expr_ptr> mBlock;
 
 public:
-  while_loop( expr_ptr cond, std::vector<> block );
+  while_loop( expr_ptr cond, std::vector<expr_ptr>&& block );
+
+  std::string
+  generate() const {}
 };
 
-using while_ptr = unique_ptr<while_loop>;
-using make_while = make_unique<while_loop>;
+using while_ptr = std::unique_ptr<while_loop>;
+//extern const decltype( std::make_unique<while_loop> )& make_while;
 
 #endif
 

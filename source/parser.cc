@@ -3,6 +3,7 @@
 #include<string>
 
 #include<parser.hh>
+#include<for.hh>
 
 using namespace std;
 
@@ -20,11 +21,8 @@ parser::parse_primary(){
   break;
 
   case classification::IDENTIFIER:
-    return parse_identifier();
-  break;
-
-  case classification::IF:
-    return parse_branch();
+    //! @todo retrieve actual typename
+    return make_unique<variable>( type( "void" ), parse_identifier() );
   break;
 
   default:
@@ -77,20 +75,26 @@ parser::getPrecedence(){
 
 stmnt_ptr
 parser::parse_prog_statement(){
-  parse_statement();
-  xor
+  parse_decl_stmnt();
   parse_function_declaration();
 }
 
-expr_ptr
+stmnt_ptr
+parser::parse_decl_stmnt(){
+  parse_variable_declaration();
+  parse_type_spec();
+}
+
+//! @todo add array and initialization parsing
+stmnt_ptr
 parser::parse_variable_declaration(){
   //extern?
   type t = parse_type();
-  string s = parse_identifier();
+  identifier s = parse_identifier();
   //'['integer']'
   //parse_initialization();
 
-  return make_var( t, s );
+  return make_unique<variable>( t, s );
 }
 
 stmnt_ptr
@@ -114,27 +118,27 @@ parser::parse_function_declaration(){
 
   ++mCurTok;
 
-  return make_proto( return_type, name, params );
+  return make_unique<prototype>( return_type, name, move( params ) );
 }
 
-type_ptr
+type
 parser::parse_type(){
-  set<qualifer> quals;
-  qualifer next;
+  set<qualifier> quals;
+  qualifier next;
   
-  next = parse_qualifer();
+  next = parse_qualifier();
   while( next != "" ){
     quals.insert( next );
-    next = parse_qualifer();
+    next = parse_qualifier();
   }
 
-  return make_type( parse_typename(), quals );
-  //pointers?
+  return type( parse_typename(), quals );
+  //! @todo parse pointer types?
 }
 
 qualifier
 parser::parse_qualifier(){
-  qualifer ret;
+  qualifier ret;
 
   if( ret == "const"
    || ret == "volatile"
@@ -147,7 +151,7 @@ parser::parse_qualifier(){
   return ret;
 }
 
-stmnt_ptr
+parser::identifier
 parser::parse_typename(){
   return parse_identifier();
 }
@@ -158,9 +162,9 @@ parser::parse_type_spec(){
   parse_type();
 }
 
-stmnt_ptr
+parser::identifier
 parser::parse_identifier(){
-  identifier ident = mCurTok->lexeme;
+  string ident = mCurTok->lexeme;
   char first = ident[0];
 
   if( first >= '0' && first <= '9' ){
@@ -176,7 +180,7 @@ parser::parse_initialization(){
   parse_value();*/
 }
 
-vector<type> params;
+vector<type>
 parser::parse_param_list(){
   vector<type> params;
 
@@ -212,14 +216,14 @@ parser::parse_param(){
 
 stmnt_ptr
 parser::parse_integer(){
-  parse_digit();*
+  //parse_digit();*
 }
 
 stmnt_ptr
 parser::parse_number(){
-  parse_integer();
+  /*parse_integer();
   if( '.' )
-  parse_integer();
+  parse_integer();*/
 }
 
 expr_ptr
@@ -246,23 +250,26 @@ parser::parse_statement(){
 
 vector<expr_ptr>
 parser::parse_arg_list(){
-  vector<expr_ptr> args;
-
-  type next = parse_arg();
-  if( next.type_name() != "" ){
-    args.emplace_back( next );
+  if( mCurTok->type != classification::LPAREN ){
+    throw runtime_error( "Expected '(' for a function call" );
   }
+
+  ++mCurTok;
+
+  vector<expr_ptr> args;
 
   // this can be implemented with recursion by using an if, and a recursive call
   // chose not to implement recursively for performance
-  while( mCurTok->type == classification::COMMA ){
-    ++mCurTok;
+  while( mCurTok->type != classification::RPAREN ){
+    args.emplace_back( move( parse_arg() ) );
 
-    next = parse_arg();
-
-    if( next.type_name() == "" ){
-      throw runtime_error( "Error parsing argument" );
+    if( mCurTok->type != classification::COMMA ){
+      break;
     }
+  }
+
+  if( mCurTok->type != classification::RPAREN ){
+    throw runtime_error( "Expected ')' at the end of function call" );
   }
 
   return args;
@@ -270,7 +277,7 @@ parser::parse_arg_list(){
 
 expr_ptr
 parser::parse_arg(){
-  parse_expression();
+  return parse_expression();
 }
 
 stmnt_ptr
@@ -311,7 +318,7 @@ parser::parse_for(){
     throw runtime_error( "Expected '(' after 'for'" );
   }
 
-  ++mCurtok;
+  ++mCurTok;
 
   stmnt_ptr init = parse_statement();
   if( mCurTok->type != classification::SEMI ){
@@ -338,9 +345,9 @@ parser::parse_for(){
     throw runtime_error( "Expected ')' after for loop parameters" );
   }
 
-  ++mCurtok;
+  ++mCurTok;
 
-  return make_for( init, cond, cntrl, parse_brackets() );
+  return make_unique<for_loop>( move( init ), move( cond ), move( cntrl ), move( parse_brackets() ) );
 }
 
 while_ptr
@@ -353,7 +360,7 @@ parser::parse_while(){
 
   expr_ptr condition = parse_expression();
 
-  return make_while( condition, parse_brackets() );
+  return make_unique<while_loop>( move( condition ), move( parse_brackets() ) );
 }
 
 std::vector<expr_ptr>
@@ -378,20 +385,8 @@ parser::parse_brackets(){
 //! @todo expression parsing needs fixing
 expr_ptr
 parser::parse_expression(){
-  bool paren;
-
-  if( mCurTok->type == classification::LPAREN ){
-    ++mCurTok;
-    paren = true;
-  }
-
-  auto E = parse_binary( 0, parse_primary() );
-
-  if( paren && mCurTok->type != classification::RPAREN ){
-    throw runtime_error( "Expected ')'" );
-  }
-
-  return E;
+//! @todo doesn't parse function calls
+  return parse_binary( 0, parse_primary() );
 }
 
 expr_ptr
@@ -407,7 +402,7 @@ parser::parse_binary( int lhs_precedence, expr_ptr lhs ){
 
     ++mCurTok;
 
-    auto rhs = expression();
+    auto rhs = parse_expression();
 
     int next_precedence = getPrecedence();
 
