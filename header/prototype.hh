@@ -7,6 +7,7 @@
 
 #include<statement.hh>
 
+// does prototype need to inherit statement?
 class prototype : public statement{
 private:
   std::string mName;
@@ -18,6 +19,9 @@ public:
 
   std::string
   name() const;
+
+  std::string
+  generate() const;
 };
 
 using proto_ptr = std::unique_ptr<prototype>;

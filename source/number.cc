@@ -4,11 +4,13 @@
 
 using namespace std;
 
-number::number( double val ):
-  mValue( val ){
+number::number( double val )
+  : base( "double" )
+  , mValue( val ){
 }
 
-number::number( std::string val ){
+number::number( std::string val )
+  : base( "double" ){
   stringstream ss( val );
   ss >> mValue;
 }

@@ -4,11 +4,14 @@
 #include<memory>
 #include<vector>
 
+#include<statement.hh>
 #include<expression.hh>
 
 // if expressions are more statements, but this is fine
-class ifExpr : public expression{
+class ifExpr : public statement{
 private:
+  using base = statement;
+
   expr_ptr mCond;
   std::vector<expr_ptr> mThen;
   std::vector<expr_ptr> mElse;

@@ -91,7 +91,6 @@ private:
   parse_while();
 
   std::vector<expr_ptr>
-  stmnt_ptr
   parse_block();
 
   expr_ptr

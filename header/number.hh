@@ -8,6 +8,8 @@
 
 class number : public expression{
 private:
+  using base = expression;
+
   double mValue;
 
 public:

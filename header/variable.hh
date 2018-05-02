@@ -21,8 +21,8 @@ public:
   generate() const override;
 };
 
-using var_ptr = unique_ptr<variable>;
-using make_var = make_unique<variable>;
+using var_ptr = std::unique_ptr<variable>;
+//extern const decltype( make_unique<variable> )& make_var;
 
 #endif
 

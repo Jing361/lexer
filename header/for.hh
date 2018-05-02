@@ -13,11 +13,11 @@ private:
   stmnt_ptr mLoopControl;
   // statements and expressions?
   // type erasure?(both will use some kind of code generation?)
-  std::vector<> mBlock;
+  std::vector<expr_ptr> mBlock;
 
 public:
   for_loop( stmnt_ptr initializer, expr_ptr cond, stmnt_ptr control,
-            const std::vector<> block );
+            std::vector<expr_ptr>&& block );
 };
 
 using for_ptr = std::unique_ptr<for_loop>;
