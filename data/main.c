@@ -1,5 +1,5 @@
 // test comment
-void foo( x, y ){ x + y; }
+void foo( int x, int y ){ x + y; }
 foo( 1, 2 );
 
 void bar(x, y){
