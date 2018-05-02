@@ -26,7 +26,7 @@ parser::parse_primary(){
   break;
 
   default:
-    throw runtime_error( "Expected primary expression" );
+    throw runtime_error( string( "Expected primary expression:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   break;
   }
 }
@@ -38,7 +38,7 @@ parser::parse_paren(){
   auto E = parse_expression();
 
   if( mCurTok->type != classification::RPAREN ){
-    throw runtime_error( "Expected ')'" );
+    throw runtime_error( string( "Expected ')':" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   return E;
@@ -50,14 +50,7 @@ parser::parse_toplevel(){
     mTopLevel.push_back( parse_prog_statement() );
 
     if( mCurTok->type != classification::SEMI ){
-      string row;
-      string column;
-
-      stringstream ss;
-      ss << mCurTok->location.first;
-      ss >> row;
-
-      throw runtime_error( string( "Expected semicolon after expression " ) + row );
+      throw runtime_error( string( "Expected semicolon after expression " ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
     } else {
       ++mCurTok;
     }
@@ -91,7 +84,7 @@ parser::parse_prog_statement(){
         return parse_decl_stmnt();
       }
     } else {
-      throw runtime_error( "Expected identifier" );
+      throw runtime_error( string( "Expected identifier:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme  );
     }
   }
 }
@@ -125,7 +118,7 @@ parser::parse_function_declaration(){
   identifier name = parse_identifier();
 
   if( mCurTok->type != classification::LPAREN ){
-    throw runtime_error( "Expected '(' after function prototype name" );
+    throw runtime_error( string( "Expected '(' after function prototype name:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
@@ -133,7 +126,7 @@ parser::parse_function_declaration(){
   vector<type> params = parse_param_list();
 
   if( mCurTok->type != classification::LPAREN ){
-    throw runtime_error( "Expected ')' after function prototype parameter list" );
+    throw runtime_error( string( "Expected ')' after function prototype parameter list:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
@@ -190,7 +183,7 @@ parser::parse_identifier(){
   ++mCurTok;
 
   if( first >= '0' && first <= '9' ){
-    throw runtime_error( "Expected non_digit character to start identifier" );
+    throw runtime_error( string( "Expected non_digit character to start identifier:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   return ident;
@@ -219,7 +212,7 @@ parser::parse_param_list(){
     next = parse_param();
 
     if( next.type_name() == "" ){
-      throw runtime_error( "Error parsing parameter" );
+      throw runtime_error( string( "Error parsing parameter:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
     }
   }
 
@@ -266,14 +259,14 @@ parser::parse_statement(){
   } else if( mCurTok->type == classification::TYPEDEF ){
     return parse_type_spec();
   } else {
-    throw runtime_error( "Could not parse statement" );
+    throw runtime_error( string( "Could not parse statement:" ) + to_string( mCurTok->location.first ) );
   }
 }
 
 vector<expr_ptr>
 parser::parse_arg_list(){
   if( mCurTok->type != classification::LPAREN ){
-    throw runtime_error( "Expected '(' for a function call" );
+    throw runtime_error( string( "Expected '(' for a function call" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
@@ -291,7 +284,7 @@ parser::parse_arg_list(){
   }
 
   if( mCurTok->type != classification::RPAREN ){
-    throw runtime_error( "Expected ')' at the end of function call" );
+    throw runtime_error( string( "Expected ')' at the end of function call:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   return args;
@@ -311,13 +304,13 @@ parser::parse_function_definition(){
 stmnt_ptr
 parser::parse_branch(){
   if( (++mCurTok)->type != classification::LPAREN ){
-    throw runtime_error( "Expected '(' after 'if'" );
+    throw runtime_error( string( "Expected '(' after 'if':" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
   ++mCurTok;
 
   auto condition = parse_expression();
   if( mCurTok++->type != classification::RPAREN ){
-    throw runtime_error( "Expected ')' after conditional" );
+    throw runtime_error( string( "Expected ')' after conditional:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
   auto true_br = parse_brackets();
 
@@ -331,40 +324,40 @@ parser::parse_branch(){
 stmnt_ptr
 parser::parse_for(){
   if( mCurTok->type != classification::FOR ){
-    throw runtime_error( "Expected 'for'" );
+    throw runtime_error( string( "Expected 'for':" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
 
   if( mCurTok->type != classification::LPAREN ){
-    throw runtime_error( "Expected '(' after 'for'" );
+    throw runtime_error( string( "Expected '(' after 'for':" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
 
   stmnt_ptr init = parse_statement();
   if( mCurTok->type != classification::SEMI ){
-    throw runtime_error( "Expected ';' after for loop initialization" );
+    throw runtime_error( string( "Expected ';' after for loop initialization:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
 
   expr_ptr cond = parse_expression();
   if( mCurTok->type != classification::SEMI ){
-    throw runtime_error( "Expected ';' after for loop conditional" );
+    throw runtime_error( string( "Expected ';' after for loop conditional:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
 
   stmnt_ptr cntrl = parse_statement();
   if( mCurTok->type != classification::SEMI ){
-    throw runtime_error( "Expected ';' after for loop control" );
+    throw runtime_error( string( "Expected ';' after for loop control:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
 
   if( (++mCurTok)->type != classification::RPAREN ){
-    throw runtime_error( "Expected ')' after for loop parameters" );
+    throw runtime_error( string( "Expected ')' after for loop parameters:" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
@@ -375,7 +368,7 @@ parser::parse_for(){
 while_ptr
 parser::parse_while(){
   if( mCurTok->type != classification::WHILE ){
-    throw runtime_error( "Expected 'while'" );
+    throw runtime_error( string( "Expected 'while':" ) + to_string( mCurTok->location.first ) + "\n\tFound: " + mCurTok->lexeme );
   }
 
   ++mCurTok;
